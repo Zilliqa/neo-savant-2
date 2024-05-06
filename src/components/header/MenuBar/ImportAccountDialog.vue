@@ -115,6 +115,7 @@ import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'stores/accounts';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
+import { readFileAsText } from 'src/utils'
 
 const secret = ref('');
 const keystoreFile = ref<File | null>(null);
@@ -165,7 +166,7 @@ const loadKeystore = async () => {
     return;
   }
 
-  const keystore = await readUploadedFileAsText(keystoreFile.value);
+  const keystore = await readFileAsText(keystoreFile.value);
   try {
     const account = await Account.fromFile(keystore.toString(), secret.value);
     store.add(accountName.value, account.address, account.bech32Address, forNetworks.value, {
@@ -185,24 +186,4 @@ const loadKeystore = async () => {
   }
 };
 
-const readUploadedFileAsText = async (
-  inputFile: File
-): Promise<string | ArrayBuffer> => {
-  console.log(inputFile);
-  const temporaryFileReader = new FileReader();
-
-  return new Promise((resolve, reject) => {
-    temporaryFileReader.onerror = () => {
-      temporaryFileReader.abort();
-      reject(new Error('Problem parsing input file.'));
-    };
-
-    temporaryFileReader.onload = () => {
-      if (temporaryFileReader.result !== null) {
-        resolve(temporaryFileReader.result);
-      }
-    };
-    temporaryFileReader.readAsText(inputFile);
-  });
-};
 </script>
