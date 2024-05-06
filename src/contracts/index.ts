@@ -12,15 +12,15 @@ import asciiart from './asciiart.scilla?raw';
 import { ScillaContract } from 'src/utils';
 
 export const defaultScillaContracts: ScillaContract[] = [
-  { name: 'HelloWorld', code: helloWorld },
-  { name: 'ZRC-6', code: zrc6 },
-  { name: 'BookStore', code: bookstore },
-  { name: 'CrowdFunding', code: crowdfunding },
-  { name: 'Auction', code: auction },
-  { name: 'FungibleToken', code: fungibleToken },
-  { name: 'NonFungible', code: nonFungibleToken },
-  { name: 'ZilGame', code: zilGame },
-  { name: 'SchnorrTest', code: schnorr },
-  { name: 'ECDSATest', code: ecdsa },
-  { name: 'AsciiArt', code: asciiart },
+  { name: 'HelloWorld.scilla', code: helloWorld },
+  { name: 'ZRC-6.scilla', code: zrc6 },
+  { name: 'BookStore.scilla', code: bookstore },
+  { name: 'CrowdFunding.scilla', code: crowdfunding },
+  { name: 'Auction.scilla', code: auction },
+  { name: 'FungibleToken.scilla', code: fungibleToken },
+  { name: 'NonFungible.scilla', code: nonFungibleToken },
+  { name: 'ZilGame.scilla', code: zilGame },
+  { name: 'SchnorrTest.scilla', code: schnorr },
+  { name: 'ECDSATest.scilla', code: ecdsa },
+  { name: 'AsciiArt.scilla', code: asciiart },
 ];
