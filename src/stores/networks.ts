@@ -7,21 +7,30 @@ export const useNetworksStore = defineStore('networks', {
     networks: [
       {
         name: 'Simulated ENV',
-        url: 'https://scilla-server.zilliqa.com/contract/check',
+        url: 'https://zilliqa-isolated-server.zilliqa.com/',
         chainId: 222,
         msgVersion: 1,
+        faucet:
+          'https://dev-wallet.zilliqa.com/faucet?address={ADDRESS}&network=isolated_server',
+        explorer:
+          'https://devex.zilliqa.com/?network=https://zilliqa-isolated-server.zilliqa.com/',
       },
       {
         name: 'Testnet',
         url: 'https://dev-api.zilliqa.com',
         chainId: 333,
         msgVersion: 1,
+        faucet:
+          'https://dev-wallet.zilliqa.com/faucet?address={ADDRESS}&network=testnet',
+        explorer:
+          'https://devex.zilliqa.com/?network=https://dev-api.zilliqa.com',
       },
       {
         name: 'Mainnet',
         url: 'https://api.zilliqa.com',
         chainId: 1,
         msgVersion: 1,
+        explorer: 'https://devex.zilliqa.com/?network=https://api.zilliqa.com',
       },
     ] as Network[],
   }),
@@ -39,7 +48,13 @@ export const useNetworksStore = defineStore('networks', {
     },
   },
   actions: {
-    addNetwork(name: string, url: string, chainId: number) {
+    addNetwork(
+      name: string,
+      url: string,
+      chainId: number,
+      faucet?: string,
+      explorer?: string
+    ) {
       if (this.getByName(name) !== undefined) {
         throw new Error('There is already another network with the same name.');
       }
@@ -48,7 +63,8 @@ export const useNetworksStore = defineStore('networks', {
         url,
         chainId,
         msgVersion: 1,
-        zilliqa: new Zilliqa(url),
+        faucet,
+        explorer,
       });
     },
     deleteNetwork(name: string) {
