@@ -6,6 +6,7 @@ export const useFilesStore = defineStore('files', {
   state: () => ({
     files: [...defaultScillaContracts] as ScillaContract[],
     selected: null as null | ScillaContract,
+    openFiles: [] as string[],
   }),
   actions: {
     setSelected(name: string) {
@@ -14,6 +15,12 @@ export const useFilesStore = defineStore('files', {
         throw new Error(`No file with id ${name}`);
       }
       this.selected = file;
+      if (this.openFiles.indexOf(name) === -1) {
+        this.openFiles.push(name);
+      }
+    },
+    removeFromOpenFiles(name: string) {
+      this.openFiles = this.openFiles.filter((file) => file !== name);
     },
     addNew(name: string, code: string) {
       if (this.getByName(name) !== undefined) {

@@ -27,71 +27,60 @@
         label="Deploy"
         icon="send"
         @click="deployContract"
-        :disable="contractFile == ''"
       >
         <user-network-not-selected />
       </q-btn>
     </q-bar>
-
-    <div class="col row">
+    <q-tabs
+      v-model="tab"
+      dense
+      class="bg-grey-2 shadow-1"
+      active-color="orange"
+      active-bg-color="grey-4"
+      indicator-color="orange"
+      align="left"
+      no-caps
+    >
+      <q-tab v-for="file in filesStore.openFiles" :name="file" :key="file">
+        <div class="row items-center">
+          {{ file }}
+          <q-btn round dense flat icon="close" size="xs" class="q-ml-sm" @click="closeFile(file)"/>
+        </div>
+      </q-tab>
+    </q-tabs>
+    <div v-show="tab === file" class="col row" v-for="file in filesStore.openFiles" :name="file" :key="file">
       <q-scroll-area class="col">
-        <code-mirror @change="editorChanged" v-model="code" basic/>
+        <editor-tab :file-name="file"/>
       </q-scroll-area>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import DeployContractDialog from 'components/contracts/DeployContractDialog.vue';
-import UserNetworkNotSelected from 'components/UserNetworkNotSelectedAlarm.vue';
-import CodeMirror from 'vue-codemirror6';
-
-import { ref, onMounted } from 'vue';
-import { eventBus } from 'src/event-bus';
-import { useQuasar } from 'quasar';
-import { ScillaContract } from 'src/utils';
-import { EditorState } from '@codemirror/state';
 import { useFilesStore } from 'src/stores/files';
-
-const code = ref('');
-const contractFile = ref('');
-// const editor = ref<InstanceType<typeof ScillaEditor>>();
-const q = useQuasar();
-
-onMounted(() => {
-  eventBus.on('contract-selected', (contract: ScillaContract) => {
-    code.value = contract.code;
-    contractFile.value = contract.name;
-  });
-});
+import {ref} from 'vue';
+import UserNetworkNotSelected from 'components/UserNetworkNotSelectedAlarm.vue';
+import EditorTab from './editor/EditorTab.vue';
+// import DeployContractDialog from 'components/contracts/DeployContractDialog.vue';
+const tab = ref('');
+const filesStore = useFilesStore();
 
 defineOptions({
   name: 'EditorPage',
 });
 
-// const toggleSearchPanel = () => {
-//   return;
-//   // if (editor.value) {
-//   //   editor.value.toggleSearchPanel();
-//   // }
-// };
-
-// const toggleLintPanel = () => {
-//   return;
-//   // if (editor.value) {
-//   //   editor.value.toggleLintPanel();
-//   // }
-// };
-
 const deployContract = () => {
-  q.dialog({
-    component: DeployContractDialog,
-    componentProps: { file: contractFile.value, code: code.value },
-  });
+  // q.dialog({
+  //   component: DeployContractDialog,
+  //   componentProps: { file: contractFile.value, code: code.value },
+  // });
 };
 
-const editorChanged = (state: EditorState) => {
-  const filesStore = useFilesStore();
-  filesStore.updateSelectedFileCode(state.doc.toString());
+const closeFile = (file: string) => {
+  filesStore.removeFromOpenFiles(file);
+  console.log(filesStore.openFiles[0])
+  tab.value = filesStore.openFiles[0];
+  console.log(tab.value);
 }
+
 </script>
