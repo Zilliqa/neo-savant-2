@@ -26,7 +26,6 @@ export const useAccountsStore = defineStore('accounts', {
         account,
         networks,
         balance: '0',
-        balanceRefreshInProgress: false,
       });
       const blockchainStore = useBlockchainStore();
       if ('keystore' in account) {
@@ -41,15 +40,9 @@ export const useAccountsStore = defineStore('accounts', {
         throw new Error(`No account with name of ${name}`);
       }
 
-      account.balanceRefreshInProgress = true;
-      try {
-        const blockchainStore = useBlockchainStore();
-        const balance = await blockchainStore.getBalance(account.address);
-        account.balance = balance;
-      } catch (error) {
-      } finally {
-        account.balanceRefreshInProgress = false;
-      }
+      const blockchainStore = useBlockchainStore();
+      const balance = await blockchainStore.getBalance(account.address);
+      account.balance = balance;
     },
   },
   getters: {

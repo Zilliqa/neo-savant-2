@@ -11,21 +11,60 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <div class="column q-gutter-md">
-          <q-input class="col" label="Name" v-model="name" :rules="[val => !!val || 'Name is required']"/>
-          <q-input class="col" label="URL" v-model="url" :rules="[val => !!val || 'URL is required']"/>
+        <div class="column q-gutter-sm">
           <q-input
+            filled
+            dense
+            class="col"
+            label="Name"
+            v-model="name"
+            :rules="[(val) => !!val || 'Name is required']"
+          />
+          <q-input
+            filled
+            dense
+            class="col"
+            label="URL"
+            v-model="url"
+            :rules="[(val) => !!val || 'URL is required']"
+          />
+          <q-input
+            filled
+            dense
             class="col"
             label="Chain ID"
             type="number"
             v-model="chaiId"
-            :rules="[val => !!val || 'Chain ID is required']"
+            :rules="[(val) => !!val || 'Chain ID is required']"
+          />
+          <q-input
+            filled
+            dense
+            class="col"
+            label="Faucet"
+            hint="Optional. Add a {ADDRESS} to the URL. It'll be replaced with the account's address"
+            v-model="faucet"
+          />
+          <q-input
+            filled
+            dense
+            class="col"
+            label="Network Explorer"
+            hint="Optional"
+            v-model="explorer"
           />
         </div>
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-2">
-        <q-btn :disable="addIsDisabled" no-caps flat color="primary" @click="addNetwork">Add</q-btn>
+        <q-btn
+          :disable="addIsDisabled"
+          no-caps
+          flat
+          color="primary"
+          @click="addNetwork"
+          >Add</q-btn
+        >
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -45,14 +84,18 @@ const show = ref(true);
 const name = ref('');
 const url = ref('');
 const chaiId = ref(0);
+const faucet = ref('');
+const explorer = ref('');
 
 const addIsDisabled = computed(() => {
-  return name.value === '' && url.value === '' && chaiId.value === 0
-})
+  return name.value === '' && url.value === '' && chaiId.value === 0;
+});
 
 const addNetwork = () => {
+  const faucetUrl = faucet.value === '' ? undefined : faucet.value;
+  const explorerUrl = explorer.value === '' ? undefined : explorer.value;
   try {
-    store.addNetwork(name.value, url.value, chaiId.value);
+    store.addNetwork(name.value, url.value, chaiId.value, faucetUrl, explorerUrl);
     quasar.notify({
       type: 'positive',
       message: `${name.value} added to the networks.`,

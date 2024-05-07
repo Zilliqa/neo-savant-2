@@ -28,26 +28,45 @@
         </q-list>
       </q-menu>
     </q-btn>
-    <q-separator vertical/>
-    <q-btn dense flat label="Network Explorer" no-caps icon="dns" />
-    <q-separator vertical/>
-    <q-btn dense flat label="Faucet" no-caps icon="account_balance" />
-    <q-separator vertical/>
+    <q-separator vertical />
+    <template
+      v-if="explorerLink !== ''"
+    >
+      <q-btn dense flat label="Network Explorer" no-caps icon="dns" :href="explorerLink" target="_blank"/>
+      <q-separator vertical />
+    </template>
+    <template
+      v-if="faucetLink !== ''"
+    >
+      <q-btn
+        dense
+        flat
+        label="Faucet"
+        no-caps
+        icon="account_balance"
+        :href="faucetLink"
+        target="_blank"
+      />
+      <q-separator vertical />
+    </template>
     <q-btn dense flat label="Help" no-caps icon="help">
       <q-menu auto-close>
         <q-list dense>
-          <q-item clickable>
+          <q-item
+            clickable
+            @click="openURL('https://scilla.readthedocs.io/en/latest/')"
+          >
             <q-item-section>Scilla Docs</q-item-section>
           </q-item>
-          <q-item clickable>
+          <q-item clickable @click="openURL('https://learnscilla.com/')">
             <q-item-section>Tutorial</q-item-section>
           </q-item>
         </q-list>
       </q-menu>
     </q-btn>
-    <q-space/>
+    <q-space />
     <div class="row">
-      <q-space/>
+      <q-space />
       <transactions></transactions>
       <q-separator vertical />
       <network-selector></network-selector>
@@ -60,13 +79,32 @@
 import NetworkSelector from 'components/header/MenuBar/NetworkSelector.vue';
 import AccountSelector from 'components/header/MenuBar/AccountSelector.vue';
 import Transactions from 'components/header/MenuBar/Transactions.vue';
-import { useQuasar } from 'quasar';
+import { useQuasar, openURL } from 'quasar';
 import UnitsConverter from 'components/Tools/UnitsConverter.vue';
 import AddressConverter from 'components/Tools/AddressConverter.vue';
 import GenerateKeystoreFileDialog from 'components/Tools/GenerateKeystoreFileDialog.vue';
 import TransferZilDialog from 'components/Tools/TransferZilDialog.vue';
+import { useBlockchainStore } from 'src/stores/blockchain';
+import { computed } from 'vue';
 
 const q = useQuasar();
+const blockchain = useBlockchainStore();
+
+const faucetLink = computed(() => {
+  if (!blockchain.selectedNetwork || !blockchain.selectedNetwork.faucet || !blockchain.selectedAccount) {
+    return '';
+  }
+
+  return blockchain.selectedNetwork.faucet.replace('{ADDRESS}', blockchain.selectedAccount.bech32Address)
+})
+
+const explorerLink = computed(() => {
+  if (!blockchain.selectedNetwork || !blockchain.selectedNetwork.explorer) {
+    return '';
+  }
+
+  return blockchain.selectedNetwork.explorer
+})
 
 function showUnitConvertor() {
   q.dialog({

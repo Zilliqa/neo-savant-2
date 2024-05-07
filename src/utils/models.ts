@@ -1,11 +1,10 @@
-import { Zilliqa } from '@zilliqa-js/zilliqa';
-
 export interface Network {
   name: string;
   url: string;
   chainId: number;
   msgVersion: number;
-  zilliqa: Zilliqa;
+  faucet?: string;
+  explorer?: string;
 }
 
 export interface Contract {
@@ -40,7 +39,6 @@ export interface Account {
   address: string;
   bech32Address: string;
   balance: string;
-  balanceRefreshInProgress: boolean;
   account: KeystoreAccount | PrivatekeyAccount;
   networks: string[];
 }
