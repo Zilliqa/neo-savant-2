@@ -6,12 +6,14 @@ import { BN, bytes, units } from '@zilliqa-js/util';
 import { TxParams, Zilliqa, toChecksumAddress } from '@zilliqa-js/zilliqa';
 import { useTransactionsStore } from './transactions';
 import Long from 'long';
+import { zilpayHelper } from 'src/utils';
 
 export const useBlockchainStore = defineStore('blockchain', {
   state: () => ({
     selectedAccount: null as Account | null,
     selectedNetwork: null as Network | null,
     zilliqa: null as Zilliqa | null,
+    managedByZilpay: false,
   }),
   getters: {
     getBalance: (state) => {
@@ -113,6 +115,14 @@ export const useBlockchainStore = defineStore('blockchain', {
     },
   },
   actions: {
+    setManagedByZilpay(managed: boolean) {
+      this.managedByZilpay = managed;
+      if (!managed) {
+        this.selectedAccount = null;
+        const accountsStore = useAccountsStore();
+        accountsStore.remove('Zilpay');
+      }
+    },
     addKeystoreAccount(account: KeystoreAccount) {
       if (this.zilliqa === null) {
         throw new Error('Please select a network.');
@@ -126,12 +136,19 @@ export const useBlockchainStore = defineStore('blockchain', {
       this.zilliqa.wallet.addByPrivateKey(privateKey);
     },
     setSelectedAccount(name: string) {
+      if (this.selectedAccount && this.selectedAccount.name === name) {
+        // Nothing to do. It's already selected.
+        return;
+      }
       const accountsStore = useAccountsStore();
       const account = accountsStore.getByName(name);
       if (account === undefined) {
         throw new Error(`No account with name of ${name}`);
       }
       this.selectedAccount = account;
+      this.refreshSelectedAccountBalance().then(() => {
+        console.log('update');
+      });
     },
     setSelectedNetwork(name: string) {
       const networksStore = useNetworksStore();
@@ -180,20 +197,28 @@ export const useBlockchainStore = defineStore('blockchain', {
         true
       );
 
-      const txn = await this.zilliqa.blockchain.createTransactionWithoutConfirm(
-        tx
-      );
+      let txn;
+      let txnId: string;
+      if (this.managedByZilpay) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        txn = await zilpayHelper.signTx(tx as any);
+        txnId = txn.ID;
+        console.log(txn);
+      } else {
+        txn = await this.zilliqa.blockchain.createTransactionWithoutConfirm(tx);
+        txnId = txn.id || 'NO_ID';
+      }
 
       const store = useTransactionsStore();
       store.add({
-        id: txn.id || 'NO_ID',
+        id: txnId,
         statusMessage: 'Initialized',
         network: this.selectedNetworkName,
         amount: txParams.amount,
         from: this.zilliqa.wallet.defaultAccount?.bech32Address || 'N/A',
         to: txParams.toAddr,
       });
-      return txn.id;
+      return txnId;
     },
   },
 });

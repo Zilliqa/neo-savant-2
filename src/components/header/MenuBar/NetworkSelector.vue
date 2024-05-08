@@ -10,7 +10,8 @@
         : 'Select a Network'
     "
   >
-    <q-list dense>
+    <managed-by-zilpay v-if="blockchainStore.managedByZilpay"/>
+    <q-list dense v-else>
       <q-item-label header class="bg-grey-3 text-bold text-uppercase">
         <div class="row q-gutter-xs items-center justify-between">
           <span>Networks</span>
@@ -67,6 +68,7 @@
 
 <script setup lang="ts">
 import NewNetworkDialog from './NewNetworkDialog.vue';
+import managedByZilpay from 'components/ManagedByZilpay.vue';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
 import { useQuasar } from 'quasar';

@@ -17,7 +17,11 @@
     </template>
 
     <q-list bordered separator>
-      <q-item-label header class="bg-grey-3 text-bold text-uppercase">
+      <template v-if="blockchainStore.managedByZilpay">
+        <managed-by-zilpay />
+        <q-separator></q-separator>
+      </template>
+      <q-item-label v-else header class="bg-grey-3 text-bold text-uppercase">
         <div class="row q-gutter-xs items-center justify-between">
           <span>Accounts</span>
           <div>
@@ -44,6 +48,7 @@
           <q-item
             clickable
             :active="blockchainStore.selectedAccount?.name === account.name"
+            :disable="blockchainStore.managedByZilpay && account.name !== 'Zilpay'"
           >
             <q-item-section @click="selectAccount(account.name)" v-close-popup>
               <q-item-label>
@@ -94,6 +99,7 @@ import { useQuasar } from 'quasar';
 import { useBlockchainStore } from 'src/stores/blockchain';
 import CopyToClipboardBtn from 'components/CopyToClipboardBtn.vue';
 import AccountBalanceBadge from 'components/AccountBalanceBadge.vue';
+import managedByZilpay from 'components/ManagedByZilpay.vue';
 
 const q = useQuasar();
 const blockchainStore = useBlockchainStore();

@@ -4255,6 +4255,11 @@ yocto-queue@^0.1.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
+zilpay-types@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/zilpay-types/-/zilpay-types-0.0.4.tgz#e0e2bcb12c91e980e86c4cb82caaad4505fbe343"
+  integrity sha512-L53sq1g9BEyElk4bmQ6j5N6xEzzavVGuM6rm28Tx0UHIj21UCUn3Mc6mtdNe+eEsJ4XA+38Jhg9iQOp+VcaxWA==
+
 zip-stream@^4.1.0:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/zip-stream/-/zip-stream-4.1.1.tgz#1337fe974dbaffd2fa9a1ba09662a66932bd7135"

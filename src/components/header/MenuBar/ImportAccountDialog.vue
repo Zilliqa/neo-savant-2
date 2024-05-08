@@ -16,8 +16,8 @@
       >
         <q-tab name="privatekey" label="Private Key" />
         <q-tab name="keystore" label="Keystore" />
-        <q-tab name="ledger" label="Ledger" />
         <q-tab name="zilpay" label="Zilpay" />
+        <q-tab name="ledger" label="Ledger" />
       </q-tabs>
 
       <q-separator />
@@ -91,11 +91,12 @@
           </div>
         </q-tab-panel>
 
-        <q-tab-panel name="ledger">
-          NOT SUPPORTED YET
+        <q-tab-panel name="zilpay">
+          <div class="text-h6 q-mb-sm">Connect to Zilpay</div>
+          <q-btn color="primary" @click="connectToZilpay">Connect</q-btn>
         </q-tab-panel>
 
-        <q-tab-panel name="zilpay">
+        <q-tab-panel name="ledger">
           NOT SUPPORTED YET
         </q-tab-panel>
       </q-tab-panels>
@@ -115,7 +116,8 @@ import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'stores/accounts';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
-import { readFileAsText } from 'src/utils'
+import { readFileAsText } from 'src/utils';
+import { zilpayHelper } from 'src/utils';
 
 const secret = ref('');
 const keystoreFile = ref<File | null>(null);
@@ -185,5 +187,21 @@ const loadKeystore = async () => {
     });
   }
 };
+
+const connectToZilpay = async () => {
+  try {
+    await zilpayHelper.connect()
+    q.notify({
+      type: 'info',
+      message: 'Successfully connected to Zilpay wallet!'
+    });
+    show.value = false;
+  } catch (error) {
+    q.notify({
+      type: 'negative',
+      message: `Failed to connect to Zilpay. ${error}`,
+    });
+  }
+}
 
 </script>
