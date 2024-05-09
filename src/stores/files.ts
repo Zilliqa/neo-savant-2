@@ -34,6 +34,14 @@ export const useFilesStore = defineStore('files', {
       }
       this.files = this.files.filter((file) => file.name !== name);
     },
+    updateFileCode(name: string, code: string) {
+      const file = this.getByName(name);
+      if (file === undefined) {
+        throw new Error(`There is no file with name ${name}`);
+      }
+
+      file.code = code;
+    },
     updateSelectedFileCode(code: string) {
       if (this.selected === null) {
         throw new Error(`There is not file with name ${name}`);
