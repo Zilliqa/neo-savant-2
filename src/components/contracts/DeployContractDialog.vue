@@ -14,6 +14,7 @@
         <div class="column">
           <div class="row q-gutter-sm">
             <q-input
+              autofocus
               dense
               filled
               class="col"
