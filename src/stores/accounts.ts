@@ -42,7 +42,14 @@ export const useAccountsStore = defineStore('accounts', {
       }
     },
     remove(name: string) {
+      const account = this.getByName(name);
+      if (account === undefined) {
+        return;
+      }
+
       this.accounts = this.accounts.filter((account) => account.name !== name);
+      const blockchainStore = useBlockchainStore();
+      blockchainStore.removeAccount(account);
     },
     async refreshBalance(name: string) {
       const account = this.getByName(name);

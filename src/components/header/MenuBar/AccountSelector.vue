@@ -76,6 +76,7 @@
                   dense
                   round
                   icon="delete"
+                  @click="deleteAccount(account)"
                 />
                 <q-btn class="gt-xs" size="10px" flat dense round icon="edit" />
               </div>
@@ -101,6 +102,7 @@ import { useBlockchainStore } from 'src/stores/blockchain';
 import CopyToClipboardBtn from 'components/CopyToClipboardBtn.vue';
 import AccountBalanceBadge from 'components/AccountBalanceBadge.vue';
 import managedByZilpay from 'components/ManagedByZilpay.vue';
+import { Account } from 'src/utils';
 
 const q = useQuasar();
 const blockchainStore = useBlockchainStore();
@@ -128,6 +130,30 @@ const selectAccount = (name: string) => {
     });
   }
 };
+
+const deleteAccount = (account: Account) => {
+  q.dialog({
+    title: 'Delete Account',
+    message: `Are you sure to delete <strong>${account.name}</strong>?`,
+    html: true,
+    cancel: true,
+  }).onOk(() => {
+    try {
+      accountsStore.remove(account.name);
+      q.notify({
+        type: 'info',
+        message: `<strong>${name}</strong> account deleted.`,
+        html: true,
+      });
+    } catch (error) {
+      q.notify({
+        type: 'negative',
+        message: `Failed to delete <strong>${name}</strong> account. ${error}`,
+        html: true,
+      });
+    }
+  });
+}
 
 </script>
 
