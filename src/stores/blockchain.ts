@@ -135,6 +135,13 @@ export const useBlockchainStore = defineStore('blockchain', {
       }
       this.zilliqa.wallet.addByPrivateKey(privateKey);
     },
+    removeAccount(account: Account) {
+      if (this.selectedAccount && this.selectedAccount.name === account.name) {
+        this.selectedAccount = null;
+      }
+
+      this.zilliqa?.wallet.remove(account.address);
+    },
     setSelectedAccount(name: string) {
       if (this.selectedAccount && this.selectedAccount.name === name) {
         // Nothing to do. It's already selected.

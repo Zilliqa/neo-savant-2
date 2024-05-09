@@ -1,10 +1,15 @@
 <template>
-  <div ref="editor"></div>
+  <code-mirror
+    ref="cm"
+    @change="emit('change', model!)"
+    v-model="model"
+    :extensions="extensions"
+  />
 </template>
 
 <script setup lang="ts">
+import CodeMirror from 'vue-codemirror6';
 import { EditorView } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
 import {
   closeBrackets,
   closeBracketsKeymap,
@@ -37,31 +42,24 @@ import {
   lineNumbers,
 } from '@codemirror/view';
 
-import { onMounted, ref, defineModel, watch } from 'vue';
+import { onMounted, ref, defineModel, Ref } from 'vue';
 import {
   scillaCheck,
   Warning as CheckerWarning,
   Error as CheckerError,
 } from 'src/scilla';
 
-const editor = ref<Element>();
-const model = defineModel({ type: String });
+const emit = defineEmits<{(e: 'change', value: string): void}>();
+const cm: Ref<InstanceType<typeof CodeMirror> | undefined> = ref();
+const model = defineModel({type: String});
 let _toggleSearchPanel = false;
 let _toggleLintPanel = false;
 
 let editorView: EditorView;
 
-watch(model, (newVal) => {
-  if (newVal) {
-    editorView.dispatch({
-      changes: {
-        from: 0,
-        to: editorView.state.doc.length,
-        insert: newVal,
-      },
-    });
-  }
-});
+onMounted(() => {
+  editorView = cm.value.view
+})
 
 const toggleSearchPanel = () => {
   _toggleSearchPanel = !_toggleSearchPanel;
@@ -87,7 +85,11 @@ defineExpose({
 });
 
 const scillaLinter = linter(async (view): Promise<Diagnostic[]> => {
-  let response = await scillaCheck(view.state.doc.toString());
+  if (model.value === '' || model.value === undefined) {
+    return [];
+  }
+
+  let response = await scillaCheck(model.value);
   let diagnostics: Diagnostic[] = [];
   if (response.warnings) {
     response.warnings.forEach((err: CheckerWarning) => {
@@ -120,37 +122,30 @@ const scillaLinter = linter(async (view): Promise<Diagnostic[]> => {
   return diagnostics;
 });
 
-onMounted(() => {
-  editorView = new EditorView({
-    state: EditorState.create({
-      doc: model.value,
-      extensions: [
-        lineNumbers(),
-        highlightActiveLineGutter(),
-        highlightSpecialChars(),
-        history(),
-        foldGutter(),
-        drawSelection(),
-        dropCursor(),
-        bracketMatching(),
-        closeBrackets(),
-        crosshairCursor(),
-        highlightActiveLine(),
-        highlightSelectionMatches(),
-        scillaLinter,
-        lintGutter(),
-        keymap.of([
-          ...closeBracketsKeymap,
-          ...defaultKeymap,
-          ...searchKeymap,
-          ...historyKeymap,
-          ...foldKeymap,
-          ...completionKeymap,
-          ...lintKeymap,
-        ]),
-      ],
-    }),
-    parent: editor.value,
-  });
-});
+const extensions = [
+  lineNumbers(),
+  highlightActiveLineGutter(),
+  highlightSpecialChars(),
+  history(),
+  foldGutter(),
+  drawSelection(),
+  dropCursor(),
+  bracketMatching(),
+  closeBrackets(),
+  crosshairCursor(),
+  highlightActiveLine(),
+  highlightSelectionMatches(),
+  scillaLinter,
+  lintGutter(),
+  keymap.of([
+    ...closeBracketsKeymap,
+    ...defaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
+    ...completionKeymap,
+    ...lintKeymap,
+  ]),
+];
+
 </script>

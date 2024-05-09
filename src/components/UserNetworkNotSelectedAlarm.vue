@@ -3,6 +3,7 @@
     v-if="blockchainStore.selectedAccount === null || blockchainStore.selectedNetwork === null"
     color="red"
     floating
+    transparent
   >
     !
     <q-tooltip>Network and/or Account not selected!</q-tooltip>

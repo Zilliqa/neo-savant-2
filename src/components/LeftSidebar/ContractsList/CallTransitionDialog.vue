@@ -78,7 +78,7 @@ import { useQuasar } from 'quasar';
 import { getContractAbi } from 'src/scilla';
 import { useBlockchainStore } from 'src/stores/blockchain';
 import { useContractsStore } from 'src/stores/contracts';
-import { ref, defineProps, onMounted, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { BN, Long} from '@zilliqa-js/util';
 import GasPriceInput from 'src/components/GasPriceInput.vue';
 
