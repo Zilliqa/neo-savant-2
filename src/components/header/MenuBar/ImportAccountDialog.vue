@@ -16,8 +16,8 @@
       >
         <q-tab name="privatekey" label="Private Key" />
         <q-tab name="keystore" label="Keystore" />
-        <q-tab name="ledger" label="Ledger" />
         <q-tab name="zilpay" label="Zilpay" />
+        <q-tab name="ledger" label="Ledger" />
       </q-tabs>
 
       <q-separator />
@@ -91,18 +91,19 @@
           </div>
         </q-tab-panel>
 
-        <q-tab-panel name="ledger">
-          NOT SUPPORTED YET
+        <q-tab-panel name="zilpay">
+          <div class="text-h6 q-mb-sm">Connect to Zilpay</div>
+          Just make sure you're logged in your Zilpay wallet and click Connect.
         </q-tab-panel>
 
-        <q-tab-panel name="zilpay">
+        <q-tab-panel name="ledger">
           NOT SUPPORTED YET
         </q-tab-panel>
       </q-tab-panels>
 
       <q-separator />
       <q-card-actions align="right" class="bg-grey-2">
-        <q-btn no-caps flat color="primary" @click="load">Import</q-btn>
+        <q-btn no-caps flat color="primary" @click="importAccount">{{tab !== 'zilpay' ? 'Import' : 'Connect'}}</q-btn>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -115,7 +116,8 @@ import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'stores/accounts';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
-import { readFileAsText } from 'src/utils'
+import { readFileAsText } from 'src/utils';
+import { zilpayHelper } from 'src/utils';
 
 const secret = ref('');
 const keystoreFile = ref<File | null>(null);
@@ -136,12 +138,14 @@ const networkNames = computed(() => {
   return networksStore.networks.map((network) => network.name);
 });
 
-const load = async () => {
+const importAccount = async () => {
   switch (tab.value) {
     case 'privatekey':
       return loadPrivateKey();
     case 'keystore':
       return await loadKeystore();
+    case 'zilpay':
+      return await connectToZilpay();
   }
 }
 
@@ -185,5 +189,21 @@ const loadKeystore = async () => {
     });
   }
 };
+
+const connectToZilpay = async () => {
+  try {
+    await zilpayHelper.connect()
+    q.notify({
+      type: 'info',
+      message: 'Successfully connected to Zilpay wallet!'
+    });
+    show.value = false;
+  } catch (error) {
+    q.notify({
+      type: 'negative',
+      message: `Failed to connect to Zilpay. ${error}`,
+    });
+  }
+}
 
 </script>

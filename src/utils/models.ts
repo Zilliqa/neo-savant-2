@@ -1,3 +1,5 @@
+import { ZilPay } from 'zilpay-types';
+
 export interface Network {
   name: string;
   url: string;
@@ -39,7 +41,7 @@ export interface Account {
   address: string;
   bech32Address: string;
   balance: string;
-  account: KeystoreAccount | PrivatekeyAccount;
+  account: KeystoreAccount | PrivatekeyAccount | ZilpayAccount;
   networks: string[];
 }
 
@@ -65,4 +67,8 @@ export interface ScillaContract {
   name: string;
   code: string;
   fileName?: string;
+}
+
+export interface ZilpayAccount {
+  zilpay: ZilPay;
 }
