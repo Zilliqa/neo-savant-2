@@ -3,7 +3,6 @@
     dense
     unelevated
     no-caps
-    :disable="blockchainStore.selectedNetwork === null"
   >
     <template v-slot:label>
       <q-icon left name="wallet" />
@@ -21,8 +20,8 @@
         <managed-by-zilpay />
         <q-separator></q-separator>
       </template>
-      <q-item-label v-else header class="bg-grey-3 text-bold text-uppercase">
-        <div class="row q-gutter-xs items-center justify-between">
+      <q-item-label v-else class="bg-grey-3 text-bold text-uppercase q-pa-sm">
+        <div class="row q-gutter-xs items-center justify-between text-grey-7">
           <span>Accounts</span>
           <div>
             <q-btn
@@ -40,7 +39,8 @@
           </div>
         </div>
       </q-item-label>
-      <div v-if="accountsStore.accountsForCurrentNetwork.length > 0">
+      <q-separator/>
+      <div v-if="blockchainStore.selectedNetwork &&  accountsStore.accountsForCurrentNetwork.length > 0">
         <div
           v-for="account in accountsStore.accountsForCurrentNetwork"
           :key="account.name"
@@ -49,6 +49,7 @@
             clickable
             :active="blockchainStore.selectedAccount?.name === account.name"
             :disable="blockchainStore.managedByZilpay && account.name !== 'Zilpay'"
+            active-class="bg-teal-1 text-grey-8"
           >
             <q-item-section @click="selectAccount(account.name)" v-close-popup>
               <q-item-label>

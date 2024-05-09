@@ -12,8 +12,8 @@
   >
     <managed-by-zilpay v-if="blockchainStore.managedByZilpay"/>
     <q-list dense v-else>
-      <q-item-label header class="bg-grey-3 text-bold text-uppercase">
-        <div class="row q-gutter-xs items-center justify-between">
+      <q-item-label class="bg-grey-3 text-bold text-uppercase q-pa-sm">
+        <div class="text-grey-7 row q-gutter-xs items-center justify-between">
           <span>Networks</span>
           <div>
             <q-btn
@@ -31,11 +31,13 @@
           </div>
         </div>
       </q-item-label>
+      <q-separator/>
       <div v-for="network in networksStore.networks" :key="network.name">
         <q-item
           clickable
           v-close-popup
           :active="blockchainStore.selectedNetwork?.name === network.name"
+          active-class="bg-teal-1 text-grey-8"
         >
           <q-item-section @click="setSelectedNetwork(network.name)">
             <q-item-label>

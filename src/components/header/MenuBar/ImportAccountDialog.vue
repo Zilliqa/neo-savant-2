@@ -93,7 +93,7 @@
 
         <q-tab-panel name="zilpay">
           <div class="text-h6 q-mb-sm">Connect to Zilpay</div>
-          <q-btn color="primary" @click="connectToZilpay">Connect</q-btn>
+          Just make sure you're logged in your Zilpay wallet and click Connect.
         </q-tab-panel>
 
         <q-tab-panel name="ledger">
@@ -103,7 +103,7 @@
 
       <q-separator />
       <q-card-actions align="right" class="bg-grey-2">
-        <q-btn no-caps flat color="primary" @click="load">Import</q-btn>
+        <q-btn no-caps flat color="primary" @click="importAccount">{{tab !== 'zilpay' ? 'Import' : 'Connect'}}</q-btn>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -138,12 +138,14 @@ const networkNames = computed(() => {
   return networksStore.networks.map((network) => network.name);
 });
 
-const load = async () => {
+const importAccount = async () => {
   switch (tab.value) {
     case 'privatekey':
       return loadPrivateKey();
     case 'keystore':
       return await loadKeystore();
+    case 'zilpay':
+      return await connectToZilpay();
   }
 }
 
