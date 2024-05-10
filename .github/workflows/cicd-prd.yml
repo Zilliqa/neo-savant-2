@@ -1,0 +1,39 @@
+name: "CICD production"
+
+on:
+  # On released
+  release:
+    types: [published]
+
+jobs:
+  build-docker:
+    permissions:
+      id-token: write
+      contents: write
+    runs-on: ubuntu-22.04
+    if: github.actor != 'dependabot[bot]'
+    name: "Deploy image"
+    env:
+      REGISTRY: asia-docker.pkg.dev
+      REPOSITORY: asia-docker.pkg.dev/prj-p-devops-services-tvwmrf63/zilliqa-public
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Docker build and push - production
+        uses: Zilliqa/gh-actions-workflows/actions/ci-dockerized-app-build-push@v2
+        with:
+          push: true
+          tag: ${{ env.REPOSITORY }}/neo-savant-2:${{ github.ref_name }}
+          tag-latest: true
+          registry: ${{ env.REGISTRY }}
+          workload-identity-provider: "${{ secrets.GCP_PRD_GITHUB_WIF }}"
+          service-account: "${{ secrets.GCP_PRD_GITHUB_SA_DOCKER_REGISTRY }}"
+          cache-key: ${{ env.REPOSITORY }}/neo-savant-2-cache
+          build-args: |
+            DEPLOY_ENV=prd
