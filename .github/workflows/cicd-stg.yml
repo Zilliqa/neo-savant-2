@@ -1,0 +1,45 @@
+name: "CICD staging"
+
+on:
+  # Test run before merging
+  pull_request:
+    branches:
+      - main
+  # On merged
+  push:
+    branches:
+      - main
+
+jobs:
+  build-docker:
+    permissions:
+      id-token: write
+      contents: write
+    runs-on: ubuntu-22.04
+    if: github.actor != 'dependabot[bot]'
+    name: "Deploy image"
+    env:
+      REGISTRY: asia-docker.pkg.dev
+      REPOSITORY: asia-docker.pkg.dev/prj-d-devops-services-4dgwlsse/zilliqa-public
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Docker build and push - staging
+        uses: Zilliqa/gh-actions-workflows/actions/ci-dockerized-app-build-push@v2
+        with:
+          push: ${{ github.ref_name == github.event.repository.default_branch }}
+          tag: ${{ env.REPOSITORY }}/neo-savant-2
+          tag-length: 8
+          tag-latest: ${{ github.ref_name == github.event.repository.default_branch }}
+          registry: ${{ env.REGISTRY }}
+          workload-identity-provider: "${{ secrets.GCP_PRD_GITHUB_WIF }}"
+          service-account: "${{ secrets.GCP_STG_GITHUB_SA_DOCKER_REGISTRY }}"
+          cache-key: ${{ env.REPOSITORY }}/neo-savant-2-cache
+          build-args: |
+            DEPLOY_ENV=stg

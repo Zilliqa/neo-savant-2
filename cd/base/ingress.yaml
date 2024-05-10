@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: neo-savant-2
+  namespace: neo-savant-2
+  labels:
+    app.kubernetes.io/name: neo-savant-2
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: neo-savant-2
+                port:
+                  number: 80

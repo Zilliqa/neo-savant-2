@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: neo-savant-2-stg
+
+resources:
+  - ../../base
+  - certificate.yaml
+  - backend-config.yaml
+  - frontend-config.yaml
+
+patches:
+  - target:
+      kind: Ingress
+      name: neo-savant-2
+    patch: |-
+      - op: replace
+        path: "/spec/rules/0/host"
+        value: ide2.zilstg.dev
+      - op: replace
+        path: /metadata/annotations
+        value:
+          kubernetes.io/ingress.class: gce
+          kubernetes.io/ingress.global-static-ip-name: ide2-zilstg-dev
+          networking.gke.io/managed-certificates: neo-savant-2
+          networking.gke.io/v1beta1.FrontendConfig: neo-savant-2
+  - target:
+      kind: Service
+      name: neo-savant-2
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          beta.cloud.google.com/backend-config: '{"default": "neo-savant-2"}'
