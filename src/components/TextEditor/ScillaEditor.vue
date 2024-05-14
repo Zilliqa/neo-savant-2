@@ -3,7 +3,7 @@
     ref="cm"
     @change="emit('change', model!)"
     v-model="model"
-    :extensions="extensions"
+    :extensions="linterIsEnabled ? [...extensions, scillaLinter] : extensions"
   />
 </template>
 
@@ -24,6 +24,7 @@ import {
   lintGutter,
   openLintPanel,
   closeLintPanel,
+  forceLinting,
 } from '@codemirror/lint';
 import {
   highlightSelectionMatches,
@@ -53,7 +54,7 @@ const emit = defineEmits<{(e: 'change', value: string): void}>();
 const cm: Ref<InstanceType<typeof CodeMirror> | undefined> = ref();
 const model = defineModel({type: String});
 let _toggleSearchPanel = false;
-let _toggleLintPanel = false;
+const linterIsEnabled = ref(true);
 
 let editorView: EditorView;
 
@@ -70,18 +71,25 @@ const toggleSearchPanel = () => {
   }
 };
 
-const toggleLintPanel = () => {
-  _toggleLintPanel = !_toggleLintPanel;
-  if (_toggleLintPanel) {
+const toggleLintPanel = (toggle: boolean) => {
+  if (toggle) {
     openLintPanel(editorView);
   } else {
     closeLintPanel(editorView);
   }
 };
 
+const setLinterEnabled = (enabled: boolean) => {
+  linterIsEnabled.value = enabled;
+  if (enabled) {
+    forceLinting(editorView);
+  }
+};
+
 defineExpose({
   toggleSearchPanel,
   toggleLintPanel,
+  setLinterEnabled,
 });
 
 const scillaLinter = linter(async (view): Promise<Diagnostic[]> => {
@@ -135,7 +143,6 @@ const extensions = [
   crosshairCursor(),
   highlightActiveLine(),
   highlightSelectionMatches(),
-  scillaLinter,
   lintGutter(),
   keymap.of([
     ...closeBracketsKeymap,
