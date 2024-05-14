@@ -1,6 +1,5 @@
 <template>
-  <q-dialog v-model="show">
-    <q-card style="min-width: 500px">
+    <q-card style="min-width: 500px" flat>
       <q-card-section>
         <div class="text-h6">
           <span class="text-weight-bolder">{{ props.contract.name }}</span>
@@ -70,7 +69,6 @@
         >
       </q-card-actions>
     </q-card>
-  </q-dialog>
 </template>
 
 <script setup>

@@ -1,5 +1,5 @@
 <template>
-  <q-item>
+  <q-item clickable @click="openDetails">
     <q-item-section>
       <q-item-label>
         <div class="text-bold q-mr-sm">{{ props.contract.name }}</div>
@@ -25,6 +25,19 @@
 import ContractListItemActions from './ContractListItemActions.vue'
 import TruncatedText from 'components/TruncatedText.vue';
 import CopyToClipboardBtn from 'components/CopyToClipboardBtn.vue';
+import ContractDetailsDialog from '../ContractDetailsDialog.vue';
 
+import { useQuasar } from 'quasar';
+
+const q = useQuasar();
 const props = defineProps(['contract'])
+
+const openDetails = () => {
+  q.dialog({
+    component: ContractDetailsDialog,
+    componentProps: {
+      contract: props.contract,
+    },
+  });
+}
 </script>
