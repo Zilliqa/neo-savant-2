@@ -9,14 +9,32 @@ export const useFilesStore = defineStore('files', {
     openFiles: [] as string[],
   }),
   actions: {
-    setSelected(name: string) {
+    openAndSelect(name: string) {
+      this.addToOpenFiles(name);
+      this.setSelected(name);
+    },
+    addToOpenFiles(name: string) {
       const file = this.getByName(name);
       if (file === undefined) {
         throw new Error(`No file with id ${name}`);
       }
 
-      if (this.openFiles.indexOf(name) === -1) {
-        this.openFiles.push(name);
+      if (this.openFiles.indexOf(name) !== -1) {
+        return; // File already added
+      }
+
+      if (this.openFiles.length === 5) {
+        throw new Error(
+          'We only support 5 open files. Close one of your files!'
+        );
+      }
+
+      this.openFiles.push(name);
+    },
+    setSelected(name: string) {
+      const file = this.getByName(name);
+      if (file === undefined) {
+        throw new Error(`No file with id ${name}`);
       }
 
       this.selected = file;

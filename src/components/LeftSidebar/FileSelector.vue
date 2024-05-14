@@ -16,7 +16,9 @@ import { ref, computed } from 'vue';
 import { useFilesStore } from 'src/stores/files';
 import { ScillaContract } from 'src/utils';
 import { eventBus } from 'src/event-bus';
+import { useQuasar } from 'quasar';
 
+const q = useQuasar();
 const selected = ref('');
 const filesStore = useFilesStore();
 
@@ -38,7 +40,14 @@ const fileNodes = computed(() => {
 });
 
 function change(target: string) {
-  filesStore.setSelected(target);
+  try {
+    filesStore.openAndSelect(target);
+  } catch (error) {
+    q.notify({
+      type: 'warning',
+      message: `${error}`
+    })
+  }
   const contract = filesStore.getByName(target);
   if (contract)
     eventBus.emit('contract-selected', contract);
