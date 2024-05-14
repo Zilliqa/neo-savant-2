@@ -1,5 +1,11 @@
 <template>
-  <q-bar class="bg-grey-3 text-grey-8 shadow-1">
+  <q-bar class="text-white bg-dark">
+    <img
+      src="https://ide.zilliqa.com/img/logo.193e9b62.png"
+      style="height: 30px"
+    />
+    <div class="text-weight-bolder text-h6">Neo Savant</div>
+    <q-separator color="grey-9" vertical class="q-ml-sm"/>
     <q-btn dense flat label="Tools" no-caps icon="construction">
       <q-menu auto-close>
         <q-list dense>
@@ -28,7 +34,6 @@
         </q-list>
       </q-menu>
     </q-btn>
-    <q-separator vertical />
     <template
       v-if="explorerLink !== ''"
     >
@@ -47,7 +52,6 @@
         :href="faucetLink"
         target="_blank"
       />
-      <q-separator vertical />
     </template>
     <q-btn dense flat label="Help" no-caps icon="help">
       <q-menu auto-close>
@@ -65,6 +69,7 @@
       </q-menu>
     </q-btn>
     <q-space />
+    <q-separator color="grey-9" vertical />
     <div class="row">
       <q-space />
       <transactions></transactions>
@@ -75,17 +80,17 @@
     </div>
   </q-bar>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import NetworkSelector from 'components/header/MenuBar/NetworkSelector.vue';
 import AccountSelector from 'components/header/MenuBar/AccountSelector.vue';
 import Transactions from 'components/header/MenuBar/Transactions.vue';
-import { useQuasar, openURL } from 'quasar';
 import UnitsConverter from 'components/Tools/UnitsConverter.vue';
 import AddressConverter from 'components/Tools/AddressConverter.vue';
 import GenerateKeystoreFileDialog from 'components/Tools/GenerateKeystoreFileDialog.vue';
 import TransferZilDialog from 'components/Tools/TransferZilDialog.vue';
-import { useBlockchainStore } from 'src/stores/blockchain';
 import { computed } from 'vue';
+import { useQuasar, openURL } from 'quasar';
+import { useBlockchainStore } from 'src/stores/blockchain';
 
 const q = useQuasar();
 const blockchain = useBlockchainStore();
@@ -130,4 +135,3 @@ function showTransferZilDialog() {
   });
 }
 </script>
-<style lang=""></style>

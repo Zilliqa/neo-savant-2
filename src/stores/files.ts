@@ -6,14 +6,41 @@ export const useFilesStore = defineStore('files', {
   state: () => ({
     files: [...defaultScillaContracts] as ScillaContract[],
     selected: null as null | ScillaContract,
+    openFiles: [] as string[],
   }),
   actions: {
+    openAndSelect(name: string) {
+      this.addToOpenFiles(name);
+      this.setSelected(name);
+    },
+    addToOpenFiles(name: string) {
+      const file = this.getByName(name);
+      if (file === undefined) {
+        throw new Error(`No file with id ${name}`);
+      }
+
+      if (this.openFiles.indexOf(name) !== -1) {
+        return; // File already added
+      }
+
+      if (this.openFiles.length === 5) {
+        throw new Error(
+          'We only support 5 open files. Close one of your files!'
+        );
+      }
+
+      this.openFiles.push(name);
+    },
     setSelected(name: string) {
       const file = this.getByName(name);
       if (file === undefined) {
         throw new Error(`No file with id ${name}`);
       }
+
       this.selected = file;
+    },
+    removeFromOpenFiles(name: string) {
+      this.openFiles = this.openFiles.filter((file) => file !== name);
     },
     addNew(name: string, code: string) {
       if (this.getByName(name) !== undefined) {
