@@ -1,8 +1,9 @@
 <template>
   <q-item clickable @click="openDetails">
     <q-item-section>
-      <q-item-label>
+      <q-item-label class="row items-center justify-between">
         <div class="text-bold q-mr-sm">{{ props.contract.name }}</div>
+        <contract-list-item-actions :contract="props.contract"/>
       </q-item-label>
       <q-item-label caption>
         <div class="row items-center">
@@ -13,9 +14,6 @@
           />
           <copy-to-clipboard-btn :content="props.contract.address" />
         </div>
-      </q-item-label>
-      <q-item-label>
-        <contract-list-item-actions :contract="props.contract"/>
       </q-item-label>
     </q-item-section>
   </q-item>

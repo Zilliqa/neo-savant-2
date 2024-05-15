@@ -114,7 +114,9 @@ let editorView: EditorView;
 
 onMounted(() => {
   editorView = cm.value.view
-  code.value = props.contract.code
+  if (props.contract) {
+    code.value = props.contract.code
+  }
 })
 
 const toggleSearchPanel = () => {

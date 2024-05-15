@@ -4,6 +4,7 @@
     :persistent="false"
     :no-esc-dismiss="false"
     backdrop-filter="blur(4px)"
+    style="width: 500px;"
   >
     <q-card>
       <q-tabs
@@ -23,13 +24,12 @@
       <q-separator />
 
       <q-tab-panels v-model="tab" animated>
-        <q-tab-panel name="general_info">
-          <div class="text-h6">General Info</div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        <q-tab-panel name="general_info" class="q-pa-none">
+          <contract-general-info-card :address="props.contract.address"/>
         </q-tab-panel>
 
         <q-tab-panel name="state" class="q-pa-none">
-          <contract-state-dialog :address="props.contract.address"/>
+          <contract-state-dialog :contract="props.contract"/>
         </q-tab-panel>
 
         <q-tab-panel name="transitions" class="q-pa-none">
@@ -43,6 +43,8 @@
 import {ref} from 'vue';
 import CallTransitionDialog from './CallTransitionDialog.vue';
 import ContractStateDialog from './ContractStateDialog.vue';
+import ContractGeneralInfoCard from './ContractGeneralInfoCard.vue';
+
 const props = defineProps(['contract']);
 
 const tab = ref('general_info')
