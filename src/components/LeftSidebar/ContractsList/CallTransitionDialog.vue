@@ -1,76 +1,74 @@
 <template>
-  <q-dialog v-model="show">
-    <q-card style="min-width: 500px">
-      <q-card-section>
-        <div class="text-h6">
-          <span class="text-weight-bolder">{{ props.contract.name }}</span>
-          <span class="text-grey-7"> Transition Call</span>
+  <q-card style="min-width: 500px" flat>
+    <q-card-section>
+      <div class="text-h6">
+        <span class="text-weight-bolder">{{ props.contract.name }}</span>
+        <span class="text-grey-7"> Transition Call</span>
+      </div>
+    </q-card-section>
+    <q-card-section class="q-pt-none">
+      <div class="text-subtitle1 text-grey-7">Transaction Parameters</div>
+      <div class="column">
+        <div class="row q-gutter-sm">
+          <q-input
+            dense
+            filled
+            class="col"
+            label="Amount"
+            type="number"
+            v-model="amount"
+          />
+          <gas-price-input v-model="gasPrice" />
+          <q-input
+            dense
+            filled
+            class="col"
+            label="Gas Limit"
+            type="number"
+            v-model="gasLimit"
+          />
         </div>
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <div class="text-subtitle1 text-grey-7">Transaction Parameters</div>
-        <div class="column">
-          <div class="row q-gutter-sm">
-            <q-input
-              dense
-              filled
-              class="col"
-              label="Amount"
-              type="number"
-              v-model="amount"
-            />
-            <gas-price-input v-model="gasPrice" />
-            <q-input
-              dense
-              filled
-              class="col"
-              label="Gas Limit"
-              type="number"
-              v-model="gasLimit"
-            />
-          </div>
-        </div>
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <div class="text-subtitle1 text-grey-7">Transition</div>
-        <div v-if="transitions.length === 0">
-          <q-skeleton type="text" class="text-subtitle1" />
-          <q-skeleton type="text" class="text-caption" />
-        </div>
-        <q-option-group
-          v-else
-          v-model="selectedTransition"
-          :options="transitions"
-          color="primary"
-          dense
-          inline
-          @update:model-value="transitionChanged"
-        />
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <div class="text-subtitle1 text-grey-7">Transition Parameters</div>
-        <div v-if="selectedParams.length > 0">
-          <div
-            v-for="param in selectedParams"
-            :key="param.vname"
-            class="q-mt-sm column q-gutter-sm"
-          >
-            <q-input dense filled :label="param.vname" class="col" v-model="transitionsParameters[param.vname]"/>
-          </div>
-          {{ selectedParams.params }}
-        </div>
-        <div v-else-if="selectedTransition !== ''" class="text-grey-5 q-mt-sm">
-          <strong>{{ selectedTransition.vname }}</strong> does not need any
-          parameters
-        </div>
-      </q-card-section>
-      <q-card-actions class="bg-grey-2">
-        <q-btn no-caps flat color="primary" @click="callTransition" :loading="loading"
-          >Call Transition</q-btn
+      </div>
+    </q-card-section>
+    <q-card-section class="q-pt-none">
+      <div class="text-subtitle1 text-grey-7">Transition</div>
+      <div v-if="transitions.length === 0">
+        <q-skeleton type="text" class="text-subtitle1" />
+        <q-skeleton type="text" class="text-caption" />
+      </div>
+      <q-option-group
+        v-else
+        v-model="selectedTransition"
+        :options="transitions"
+        color="primary"
+        dense
+        inline
+        @update:model-value="transitionChanged"
+      />
+    </q-card-section>
+    <q-card-section class="q-pt-none">
+      <div class="text-subtitle1 text-grey-7">Transition Parameters</div>
+      <div v-if="selectedParams.length > 0">
+        <div
+          v-for="param in selectedParams"
+          :key="param.vname"
+          class="q-mt-sm column q-gutter-sm"
         >
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+          <q-input dense filled :label="param.vname" class="col" v-model="transitionsParameters[param.vname]"/>
+        </div>
+        {{ selectedParams.params }}
+      </div>
+      <div v-else-if="selectedTransition !== ''" class="text-grey-5 q-mt-sm">
+        <strong>{{ selectedTransition.vname }}</strong> does not need any
+        parameters
+      </div>
+    </q-card-section>
+    <q-card-actions class="bg-grey-2">
+      <q-btn no-caps flat color="primary" @click="callTransition" :loading="loading"
+        >Call Transition</q-btn
+      >
+    </q-card-actions>
+  </q-card>
 </template>
 
 <script setup>

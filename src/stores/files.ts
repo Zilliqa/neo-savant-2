@@ -60,6 +60,7 @@ export const useFilesStore = defineStore('files', {
         this.selected = null;
       }
       this.files = this.files.filter((file) => file.name !== name);
+      this.openFiles = this.openFiles.filter((file) => file !== name);
     },
     updateFileCode(name: string, code: string) {
       const file = this.getByName(name);

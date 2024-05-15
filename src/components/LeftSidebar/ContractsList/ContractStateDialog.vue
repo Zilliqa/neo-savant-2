@@ -1,56 +1,97 @@
 <template>
-  <q-dialog
-    v-model="show"
-    :persistent="false"
-    :no-esc-dismiss="false"
-    backdrop-filter="blur(4px)"
-  >
-    <q-card style="width: 500px; max-width: 80vw">
-      <q-card-section>
-        <div class="text-h6">Contract State</div>
-        <truncated-text class="text-grey-7 q-m" :text="props.txHash" :length="50" :position="25"/>
-      </q-card-section>
+  <q-card style="width: 500px; max-width: 80vw" flat>
+    <q-card-section>
+      <div class="text-h6">
+        <span class="text-weight-bolder">{{ props.contract.name }}</span>
+        <span class="text-grey-7"> State</span>
+      </div>
+      <div class="q-gutter-sm">
+        <q-radio v-model="mode" val="state" label="State" />
+        <q-radio v-model="mode" val="sub-state" label="Sub-State" />
+      </div>
 
-      <q-card-section class="q-pt-none">
-        <q-skeleton v-if="contractState === null" type="QInput" />
-        <vue-json-pretty v-else :data="contractState" />
-      </q-card-section>
-      <q-separator />
-      <q-card-actions align="right" class="bg-grey-2">
-        <q-btn
-          icon="close"
-          no-caps
-          flat
-          color="negative"
-          v-close-popup
-          >Close</q-btn
-        >
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+    </q-card-section>
+
+    <q-card-section class="q-pt-none">
+      <div class="row q-gutter-sm q-mb-sm" v-if="mode ==='sub-state'">
+        <q-input dense outlined v-model="variableName" label="Variable Name" class="col" />
+        <q-input dense outlined v-model="indices" label="Indices (Optional)" hint="Separate with comma" class="col"/>
+      </div>
+      <div class="row q-gutter-sm q-mb-sm">
+        <q-space/>
+      </div>
+      <q-skeleton v-if="loading" type="QInput"  style="height: 300px;"/>
+      <q-scroll-area v-else-if="data" style="height: 300px;" class="row">
+        <vue-json-pretty :data="data"/>
+      </q-scroll-area>
+    </q-card-section>
+    <q-separator />
+    <q-card-actions align="right" class="bg-grey-2">
+      <q-btn
+        @click="fetch"
+        icon="download"
+        no-caps
+        flat
+        color="primary"
+        >Fetch</q-btn
+      >
+    </q-card-actions>
+  </q-card>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import TruncatedText from 'components/TruncatedText.vue';
+import { ref } from 'vue';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { useBlockchainStore } from 'src/stores/blockchain';
 import { useQuasar } from 'quasar';
 
-const contractState = ref(null)
+const data = ref(null)
 const q = useQuasar();
-const props = defineProps(['address']);
+const props = defineProps(['contract']);
+const loading = ref(false);
+const mode = ref('state');
+const variableName = ref('')
+const indices = ref(undefined);
 
-onMounted(async() => {
+const fetch = async() => {
+  if (mode.value === 'state') {
+    return fetchState()
+  } else if (mode.value === 'sub-state') {
+    return fetchSubState()
+  }
+}
+
+const fetchState = async() => {
   try {
+    loading.value = true;
     const blockchainStore = useBlockchainStore();
-    contractState.value = await blockchainStore.getSmartContractState(props.address)
+    data.value = await blockchainStore.getSmartContractState(props.contract.address)
   } catch (error) {
     q.notify({
       type: 'negative',
-      message: `Failed to get the receipt. ${error.message}`
+      message: `Failed to get the state. ${error.message}`
     })
+  } finally {
+    loading.value = false;
   }
-})
+}
+
+const fetchSubState = async() => {
+  try {
+    loading.value = true;
+    const blockchainStore = useBlockchainStore();
+
+    data.value = await blockchainStore.getSmartContractSubState(props.contract.address, variableName.value,
+        indices.value === undefined ? undefined : indices.value.split(','))
+  } catch (error) {
+    q.notify({
+      type: 'negative',
+      message: `Failed to get the sub-state. ${error.message}`
+    })
+  } finally {
+    loading.value = false;
+  }
+
+}
 </script>
