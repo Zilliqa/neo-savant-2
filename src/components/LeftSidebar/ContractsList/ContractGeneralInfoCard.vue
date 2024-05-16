@@ -1,36 +1,20 @@
 <template>
-  <q-card style="width: 500px;" flat>
-    <q-card-section>
-      <div class="text-subtitle text-grey-7">{{ props.address }} </div>
-    </q-card-section>
-
-    <q-card-section class="q-pt-none">
-      <div class="row q-gutter-sm q-mb-sm">
-        <q-btn no-caps dense color="grey-9" :loading="loading && mode === 'code'" @click="fetchCode">Contract Code</q-btn>
-        <q-btn no-caps dense color="primary" v-if="mode === 'code'"  @click="importCodeToIde">Import Code to IDE</q-btn>
-        <q-btn no-caps dense color="primary" :loading="loading && mode === 'init'" @click="fetchInit">Contract Init</q-btn>
-      </div>
-      <q-skeleton v-if="loading" type="QInput"  style="height: 300px;"/>
-      <q-scroll-area v-else-if="data" style="height: 300px;" class="row">
-        <vue-json-pretty v-if="mode ==='init'" :data="data"/>
-        <code-mirror
-          v-else-if="mode ==='code'"
-          v-model="data"
-        />
-      </q-scroll-area>
-    </q-card-section>
-    <q-separator />
-    <q-card-actions align="right" class="bg-grey-2">
-      <q-btn
-        icon="close"
-        no-caps
-        flat
-        color="negative"
-        v-close-popup
-        >Close</q-btn
-      >
-    </q-card-actions>
-  </q-card>
+  <div class="column">
+    <div class="text-subtitle text-grey-7">{{ props.address }} </div>
+    <div class="row q-gutter-sm q-mb-sm">
+      <q-btn no-caps dense color="grey-9" :loading="loading && mode === 'code'" @click="fetchCode">Contract Code</q-btn>
+      <q-btn no-caps dense color="primary" v-if="mode === 'code'"  @click="importCodeToIde">Import Code to IDE</q-btn>
+      <q-btn no-caps dense color="primary" :loading="loading && mode === 'init'" @click="fetchInit">Contract Init</q-btn>
+    </div>
+    <q-skeleton v-if="loading" type="QInput"  style="height: 300px;"/>
+    <q-scroll-area v-else-if="data" class="col row">
+      <vue-json-pretty v-if="mode ==='init'" :data="data"/>
+      <code-mirror
+        v-else-if="mode ==='code'"
+        v-model="data"
+      />
+    </q-scroll-area>
+  </div>
 </template>
 
 <script setup>

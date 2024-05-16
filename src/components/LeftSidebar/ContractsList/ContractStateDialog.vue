@@ -1,13 +1,23 @@
 <template>
-  <q-card style="width: 500px; max-width: 80vw" flat>
+  <q-card flat>
     <q-card-section>
       <div class="text-h6">
         <span class="text-weight-bolder">{{ props.contract.name }}</span>
         <span class="text-grey-7"> State</span>
       </div>
-      <div class="q-gutter-sm">
+      <div class="q-gutter-sm row">
         <q-radio v-model="mode" val="state" label="State" />
         <q-radio v-model="mode" val="sub-state" label="Sub-State" />
+        <q-space/>
+        <q-btn
+          @click="fetch"
+          icon="download"
+          no-caps
+          color="dark"
+          dense
+          flat
+          >Fetch</q-btn
+        >
       </div>
 
     </q-card-section>
@@ -26,16 +36,6 @@
       </q-scroll-area>
     </q-card-section>
     <q-separator />
-    <q-card-actions align="right" class="bg-grey-2">
-      <q-btn
-        @click="fetch"
-        icon="download"
-        no-caps
-        flat
-        color="primary"
-        >Fetch</q-btn
-      >
-    </q-card-actions>
   </q-card>
 </template>
 

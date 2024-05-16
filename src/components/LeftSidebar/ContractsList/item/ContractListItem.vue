@@ -1,5 +1,5 @@
 <template>
-  <q-item clickable @click="openDetails">
+  <q-item clickable @click="contractsStore.setSelected(props.contract.name)">
     <q-item-section>
       <q-item-label class="row items-center justify-between">
         <div class="text-bold q-mr-sm">{{ props.contract.name }}</div>
@@ -23,19 +23,10 @@
 import ContractListItemActions from './ContractListItemActions.vue'
 import TruncatedText from 'components/TruncatedText.vue';
 import CopyToClipboardBtn from 'components/CopyToClipboardBtn.vue';
-import ContractDetailsDialog from '../ContractDetailsDialog.vue';
 
-import { useQuasar } from 'quasar';
+import { useContractsStore } from 'src/stores/contracts';
 
-const q = useQuasar();
 const props = defineProps(['contract'])
+const contractsStore = useContractsStore();
 
-const openDetails = () => {
-  q.dialog({
-    component: ContractDetailsDialog,
-    componentProps: {
-      contract: props.contract,
-    },
-  });
-}
 </script>
