@@ -20,6 +20,9 @@ export const useTransactionsStore = defineStore('transactions', {
     add(tx: WaitingTransaction) {
       this.transactions.push(tx);
     },
+    delete(txHash: string) {
+      this.transactions = this.transactions.filter((tx) => tx.id !== txHash);
+    },
     async refreshPendingTxns() {
       await Promise.all(
         this.pending.map((tx) => this.refreshTransactionStatus(tx.id))
