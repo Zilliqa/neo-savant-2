@@ -46,6 +46,7 @@ import ContractStateDialog from './ContractStateDialog.vue';
 import ContractGeneralInfoCard from './ContractGeneralInfoCard.vue';
 
 const props = defineProps(['contract']);
+const show = ref(true)
 
 const tab = ref('general_info')
 </script>

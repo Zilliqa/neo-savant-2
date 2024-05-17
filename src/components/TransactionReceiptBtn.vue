@@ -8,10 +8,6 @@
     icon="receipt"
     @click="showTransactionReceiptDialog()"
   >
-    <q-badge v-if="errorMessage" color="red" transparent floating>
-      !
-      <q-tooltip>{{ errorMessage }}</q-tooltip>
-    </q-badge>
     <q-tooltip>Receipt</q-tooltip>
   </q-btn>
 </template>

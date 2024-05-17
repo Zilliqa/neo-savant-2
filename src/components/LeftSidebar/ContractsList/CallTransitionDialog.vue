@@ -36,7 +36,16 @@
         <q-skeleton type="text" class="text-subtitle1" />
         <q-skeleton type="text" class="text-caption" />
       </div>
-      <q-option-group
+      <q-select
+        @update:model-value="transitionChanged"
+        v-else
+        outlined
+        dense
+        v-model="selectedTransition"
+        :options="transitions"
+        label="Filled"
+      />
+      <!-- <q-option-group
         v-else
         v-model="selectedTransition"
         :options="transitions"
@@ -44,7 +53,7 @@
         dense
         inline
         @update:model-value="transitionChanged"
-      />
+      /> -->
     </q-card-section>
     <q-card-section class="q-pt-none">
       <div class="text-subtitle1 text-grey-7">Transition Parameters</div>
@@ -54,17 +63,39 @@
           :key="param.vname"
           class="q-mt-sm column q-gutter-sm"
         >
-          <q-input dense filled :label="param.vname" class="col" v-model="transitionsParameters[param.vname]"/>
+          <JsonEditorVue
+            mode="text"
+            :mainMenuBar="false"
+            :navigationBar="false"
+            :statusBar="false"
+            v-if="isAdt(param.type)"
+            v-model="transitionsParameters[param.vname]"
+          />
+          <q-input
+            v-else
+            dense
+            filled
+            :type="scillaTypeToHtmlInputType(param.type)"
+            :hint="param.type"
+            :label="param.vname"
+            class="col"
+            v-model="transitionsParameters[param.vname]"
+          />
         </div>
         {{ selectedParams.params }}
       </div>
-      <div v-else-if="selectedTransition !== ''" class="text-grey-5 q-mt-sm">
-        <strong>{{ selectedTransition.vname }}</strong> does not need any
+      <div v-else-if="selectedTransition !== null" class="text-grey-5 q-mt-sm">
+        <strong>{{ selectedTransition.value.vname }}</strong> does not need any
         parameters
       </div>
     </q-card-section>
     <q-card-actions class="bg-grey-2">
-      <q-btn no-caps flat color="primary" @click="callTransition" :loading="loading"
+      <q-btn
+        no-caps
+        flat
+        color="primary"
+        @click="callTransition"
+        :loading="loading"
         >Call Transition</q-btn
       >
     </q-card-actions>
@@ -72,32 +103,51 @@
 </template>
 
 <script setup>
+import JsonEditorVue from 'json-editor-vue';
 import { useQuasar } from 'quasar';
 import { getContractAbi } from 'src/scilla';
 import { useBlockchainStore } from 'src/stores/blockchain';
 import { useContractsStore } from 'src/stores/contracts';
 import { ref, onMounted, computed } from 'vue';
-import { BN, Long} from '@zilliqa-js/util';
+import { BN, Long } from '@zilliqa-js/util';
 import GasPriceInput from 'src/components/GasPriceInput.vue';
+import { isAdt } from 'src/utils';
 
-const transitionsParameters = ref({})
+const transitionsParameters = ref({});
 const loading = ref(false);
 let contractCode = '';
 const props = defineProps(['contract']);
 const q = useQuasar();
-const selectedTransition = ref('');
-const show = ref(true);
+const selectedTransition = ref(null);
 const transitions = ref([]);
 const transitions2 = {};
 const amount = ref(0);
 const gasPrice = ref(0);
 const gasLimit = ref(30000);
 
+const scillaTypeToHtmlInputType = (type) => {
+  if (type.startsWith('Int') || type.startsWith('Uint')) {
+    return 'number';
+  } else if (type === 'String' || type === 'ByStr20' || type === 'BNum') {
+    return 'text';
+  } else if (
+    type.startsWith('Option') ||
+    type.startsWith('Bool') ||
+    type.startsWith('Pair') ||
+    type.startsWith('List')
+  ) {
+    return 'textarea';
+  }
+
+  console.error(`Failed to map ${type} to html type. text returned`);
+  return 'text';
+};
+
 const selectedParams = computed(() => {
-  if (selectedTransition.value === '') {
+  if (selectedTransition.value === null) {
     return [];
   }
-  return transitions2[selectedTransition.value.vname].params;
+  return transitions2[selectedTransition.value.value.vname].params;
 });
 
 onMounted(async () => {
@@ -108,17 +158,19 @@ onMounted(async () => {
     );
     const abi = await getContractAbi(contractCode);
     transitions.value = abi.transitions.map((t) => {
-      if (selectedTransition.value === '') {
-        selectedTransition.value = t;
+      if (selectedTransition.value === null) {
+        selectedTransition.value = {
+          value: t,
+          label: `${t.vname} (${t.params.map(param => `${param.vname}: ${param.type}`).join(',')})`
+        }
       }
       transitions2[t.vname] = t;
       return {
-        label: t.vname,
         value: t,
+        label: `${t.vname} (${t.params.map(param => `${param.vname}: ${param.type}`).join(',')})`
       };
     });
   } catch (error) {
-    show.value = false;
     q.notify({
       type: 'negative',
       message: `Failed to get the contract ABI. Error: ${error}`,
@@ -132,44 +184,73 @@ const callTransition = async () => {
   if (transitionName === '') {
     q.notify({
       type: 'negative',
-      message: 'Not possible to call an empty transition'
-    })
+      message: 'Not possible to call an empty transition',
+    });
     return;
   }
 
-  const params = transitions2[transitionName].params.map(param => {
+  const params = transitions2[transitionName].params.map((param) => {
     return {
       ...param,
-      value: transitionsParameters.value[param.vname]
-    }
+      value: isAdt(param.type)
+        ? JSON.parse(transitionsParameters.value[param.vname])
+        : transitionsParameters.value[param.vname],
+    };
   });
 
   loading.value = true;
   try {
-    const txHash = await contractsStore.callTransition(props.contract.address, transitionName, {
+    const txHash = await contractsStore.callTransition(
+      props.contract.address,
+      transitionName,
+      {
         gasPrice: new BN(gasPrice.value),
         gasLimit: Long.fromNumber(gasLimit.value),
         amount: new BN(amount.value),
-      }, params)
+      },
+      params
+    );
 
-      q.notify({
-        type: 'info',
-        message: `Transition ${transitionName} called successfully. ${txHash}`
-      })
+    q.notify({
+      type: 'info',
+      message: `Transition ${transitionName} called successfully. ${txHash}`,
+    });
   } catch (error) {
     q.notify({
       type: 'negative',
-      message: `Failed to call transition, ${error}`
-    })
+      message: `Failed to call transition, ${error}`,
+    });
   } finally {
     loading.value = false;
   }
-}
+};
 
-const transitionChanged = (value) => {
-  console.log('value', transitions2[value.vname])
-  transitionsParameters.value = {}
-  transitions2[value.vname].params.forEach(param => transitionsParameters.value[param.vname] = '')
-}
-
+const transitionChanged = ({value}) => {
+  transitionsParameters.value = {};
+  transitions2[value.vname].params.forEach((param) => {
+    if (param.type.startsWith('List')) {
+      transitionsParameters.value[param.vname] = [];
+    } else if (param.type.startsWith('Bool')) {
+      transitionsParameters.value[param.vname] = {
+        constructor: 'False',
+        argtypes: [],
+        arguments: [],
+      };
+    } else if (param.type.startsWith('Pair')) {
+      transitionsParameters.value[param.vname] = {
+        constructor: 'Pair',
+        argtypes: ['', ''],
+        arguments: ['', ''],
+      };
+    } else if (param.type.startsWith('Option')) {
+      transitionsParameters.value[param.vname] = {
+        constructor: 'None',
+        argtypes: [''],
+        arguments: [],
+      };
+    } else {
+      transitionsParameters.value[param.vname] = '';
+    }
+  });
+};
 </script>
