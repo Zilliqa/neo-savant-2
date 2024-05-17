@@ -12,6 +12,7 @@
       !
       <q-tooltip>{{ errorMessage }}</q-tooltip>
     </q-badge>
+    <q-tooltip v-else>Refresh status</q-tooltip>
   </q-btn>
 </template>
 
