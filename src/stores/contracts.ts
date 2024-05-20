@@ -160,6 +160,18 @@ export const useContractsStore = defineStore('contracts', {
     },
   },
   getters: {
+    contractsForNetwork:
+      (state) =>
+      (networkName: string): Contract[] => {
+        try {
+          return state.contracts.filter(
+            (contract) => contract.network === networkName
+          );
+        } catch (error) {
+          // No network is selected
+          return [];
+        }
+      },
     getByName:
       (state) =>
       (name: string): Contract | undefined => {

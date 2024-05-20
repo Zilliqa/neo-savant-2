@@ -33,6 +33,9 @@
             <q-item-label>
               <transaction-status-refresher-btn :tx-hash="transaction.id" />
               <transaction-receipt-btn :tx-hash="transaction.id" />
+              <q-btn flat icon="delete" round size="sm" @click="store.delete(transaction.id)">
+                <q-tooltip>Delete</q-tooltip>
+              </q-btn>
             </q-item-label>
           </q-item-section>
         </q-item>
