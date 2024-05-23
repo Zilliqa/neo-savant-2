@@ -7,6 +7,55 @@
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
+      <div class="text-subtitle1 text-grey-7">Transition</div>
+      <div v-if="transitionNames.length === 0">
+        <q-skeleton type="text" class="text-subtitle1" />
+        <q-skeleton type="text" class="text-caption" />
+      </div>
+      <q-select
+        @update:model-value="transitionChanged"
+        v-else
+        outlined
+        dense
+        v-model="selectedTransition"
+        :options="transitionNames"
+      />
+    </q-card-section>
+    <q-card-section class="q-pt-none">
+      <div class="text-subtitle1 text-grey-7">Transition Parameters</div>
+      <div v-if="selectedParams.length > 0">
+        <div
+          v-for="param in selectedParams"
+          :key="param.vname"
+          class="q-mt-sm column q-gutter-sm"
+        >
+          <JsonEditorVue
+            mode="text"
+            :mainMenuBar="false"
+            :navigationBar="false"
+            :statusBar="false"
+            v-if="isAdt(param.type)"
+            v-model="transitionsParameters[param.vname]"
+          />
+          <q-input
+            v-else
+            dense
+            filled
+            :type="scillaTypeToHtmlInputType(param.type)"
+            :hint="param.type"
+            :label="param.vname"
+            class="col"
+            v-model="transitionsParameters[param.vname]"
+          />
+        </div>
+        {{ selectedParams.params }}
+      </div>
+      <div v-else-if="selectedTransition !== null" class="text-grey-5 q-mt-sm">
+        <strong>{{ selectedTransition.value }}</strong> does not need any
+        parameters
+      </div>
+    </q-card-section>
+    <q-card-section class="q-pt-none">
       <div class="text-subtitle1 text-grey-7">Transaction Parameters</div>
       <div class="column">
         <div class="row q-gutter-sm">
@@ -28,65 +77,6 @@
             v-model="gasLimit"
           />
         </div>
-      </div>
-    </q-card-section>
-    <q-card-section class="q-pt-none">
-      <div class="text-subtitle1 text-grey-7">Transition</div>
-      <div v-if="transitions.length === 0">
-        <q-skeleton type="text" class="text-subtitle1" />
-        <q-skeleton type="text" class="text-caption" />
-      </div>
-      <q-select
-        @update:model-value="transitionChanged"
-        v-else
-        outlined
-        dense
-        v-model="selectedTransition"
-        :options="transitions"
-        label="Filled"
-      />
-      <!-- <q-option-group
-        v-else
-        v-model="selectedTransition"
-        :options="transitions"
-        color="primary"
-        dense
-        inline
-        @update:model-value="transitionChanged"
-      /> -->
-    </q-card-section>
-    <q-card-section class="q-pt-none">
-      <div class="text-subtitle1 text-grey-7">Transition Parameters</div>
-      <div v-if="selectedParams.length > 0">
-        <div
-          v-for="param in selectedParams"
-          :key="param.vname"
-          class="q-mt-sm column q-gutter-sm"
-        >
-          <JsonEditorVue
-            mode="text"
-            :mainMenuBar="false"
-            :navigationBar="false"
-            :statusBar="false"
-            v-if="isAdt(param.type) || param.type in adtMap"
-            v-model="transitionsParameters[param.vname]"
-          />
-          <q-input
-            v-else
-            dense
-            filled
-            :type="scillaTypeToHtmlInputType(param.type)"
-            :hint="param.type"
-            :label="param.vname"
-            class="col"
-            v-model="transitionsParameters[param.vname]"
-          />
-        </div>
-        {{ selectedParams.params }}
-      </div>
-      <div v-else-if="selectedTransition !== null" class="text-grey-5 q-mt-sm">
-        <strong>{{ selectedTransition.value.vname }}</strong> does not need any
-        parameters
       </div>
     </q-card-section>
     <q-card-actions class="bg-grey-2">
@@ -111,20 +101,28 @@ import { useContractsStore } from 'src/stores/contracts';
 import { ref, onMounted, computed } from 'vue';
 import { BN, Long } from '@zilliqa-js/util';
 import GasPriceInput from 'src/components/GasPriceInput.vue';
-import { isAdt } from 'src/utils';
 
 const transitionsParameters = ref({});
 const loading = ref(false);
-let contractCode = '';
 const props = defineProps(['contract']);
 const q = useQuasar();
 const selectedTransition = ref(null);
-const transitions = ref([]);
-const transitions2 = {};
+const transitionNames = ref([]);
+const transitions = {};
 const amount = ref(0);
 const gasPrice = ref(0);
 const gasLimit = ref(30000);
 const adtMap = {};
+
+const isAdt = (type) => {
+  return (
+    type.startsWith('Bool') ||
+    type.startsWith('List') ||
+    type.startsWith('Pair') ||
+    type.startsWith('Option') ||
+    type in adtMap
+  );
+};
 
 const scillaTypeToHtmlInputType = (type) => {
   if (type.startsWith('Int') || type.startsWith('Uint')) {
@@ -149,32 +147,31 @@ const selectedParams = computed(() => {
   if (selectedTransition.value === null) {
     return [];
   }
-  return transitions2[selectedTransition.value.value.vname].params;
+  return transitions[selectedTransition.value.value].params;
 });
 
 onMounted(async () => {
   try {
     const blockchainStore = useBlockchainStore();
-    contractCode = await blockchainStore.getSmartContractCode(
+    const contractCode = await blockchainStore.getSmartContractCode(
       props.contract.address
     );
     const abi = await getContractAbi(contractCode);
-    transitions.value = abi.transitions.map((t) => {
-      if (selectedTransition.value === null) {
-        selectedTransition.value = {
-          value: t,
-          label: `${t.vname} (${t.params.map(param => `${param.vname}: ${param.type}`).join(',')})`
-        }
-      }
-      transitions2[t.vname] = t;
+    transitionNames.value = abi.transitions.map((t) => {
+      transitions[t.vname] = t;
       return {
-        value: t,
-        label: `${t.vname} (${t.params.map(param => `${param.vname}: ${param.type}`).join(',')})`
+        label: `${t.vname} (${t.params
+          .map((param) => `${param.vname}: ${param.type}`)
+          .join(',')})`,
+        value: t.vname,
       };
     });
 
     abi.ADTs.forEach((adt) => {
-      adtMap[adt.tname] = adt
+      adtMap[adt.tname] = {
+        adt,
+        properType: adtCNameToConstructorValue(adt.tname),
+      };
     });
   } catch (error) {
     q.notify({
@@ -186,7 +183,7 @@ onMounted(async () => {
 
 const callTransition = async () => {
   const contractsStore = useContractsStore();
-  const transitionName = selectedTransition.value.value.vname;
+  const transitionName = selectedTransition.value.value;
   if (transitionName === '' || transitionName === undefined) {
     q.notify({
       type: 'negative',
@@ -195,13 +192,17 @@ const callTransition = async () => {
     return;
   }
 
-  const params = transitions2[transitionName].params.map((param) => {
-    return {
-      ...param,
-      value: isAdt(param.type)
+  const params = transitions[transitionName].params.map((param) => {
+    if (isAdt(param.type)) {
+      return typeof transitionsParameters.value[param.vname] === 'string'
         ? JSON.parse(transitionsParameters.value[param.vname])
-        : transitionsParameters.value[param.vname],
-    };
+        : transitionsParameters.value[param.vname]; // It's already a JSON
+    } else {
+      return {
+        ...param,
+        value: transitionsParameters.value[param.vname],
+      };
+    }
   });
 
   loading.value = true;
@@ -232,37 +233,54 @@ const callTransition = async () => {
 };
 
 const adtCNameToConstructorValue = (cname) => {
-  return `${props.contract.address.toLowerCase()}.${cname.split('.')[1]}`
-}
+  return `${props.contract.address.toLowerCase()}.${cname.split('.')[1]}`;
+};
 
-const transitionChanged = ({value}) => {
+const transitionChanged = ({ value }) => {
+  const transitionName = value;
   transitionsParameters.value = {};
-  transitions2[value.vname].params.forEach((param) => {
+  transitions[transitionName].params.forEach((param) => {
     if (param.type.startsWith('List')) {
-      transitionsParameters.value[param.vname] = [];
+      transitionsParameters.value[param.vname] = {
+        ...param,
+        value: [],
+      };
     } else if (param.type.startsWith('Bool')) {
       transitionsParameters.value[param.vname] = {
-        constructor: 'False',
-        argtypes: [],
-        arguments: [],
+        ...param,
+        value: {
+          constructor: 'False',
+          argtypes: [],
+          arguments: [],
+        },
       };
     } else if (param.type.startsWith('Pair')) {
       transitionsParameters.value[param.vname] = {
-        constructor: 'Pair',
-        argtypes: ['', ''],
-        arguments: ['', ''],
+        ...param,
+        value: {
+          constructor: 'Pair',
+          argtypes: ['', ''],
+          arguments: ['', ''],
+        },
       };
     } else if (param.type.startsWith('Option')) {
       transitionsParameters.value[param.vname] = {
-        constructor: 'None',
-        argtypes: [''],
-        arguments: [],
+        ...param,
+        value: {
+          constructor: 'None',
+          argtypes: [''],
+          arguments: [],
+        },
       };
     } else if (param.type in adtMap) {
       transitionsParameters.value[param.vname] = {
-        constructor: adtCNameToConstructorValue(adtMap[param.type].tname),
-        argtypes: [''],
-        arguments: [],
+        ...param,
+        type: adtMap[param.type].properType,
+        value: {
+          constructor: adtMap[param.type].properType,
+          argtypes: [''],
+          arguments: [],
+        },
       };
     } else {
       transitionsParameters.value[param.vname] = '';
