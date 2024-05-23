@@ -68,7 +68,7 @@
             :mainMenuBar="false"
             :navigationBar="false"
             :statusBar="false"
-            v-if="isAdt(param.type)"
+            v-if="isAdt(param.type) || param.type in adtMap"
             v-model="transitionsParameters[param.vname]"
           />
           <q-input
@@ -124,6 +124,7 @@ const transitions2 = {};
 const amount = ref(0);
 const gasPrice = ref(0);
 const gasLimit = ref(30000);
+const adtMap = {};
 
 const scillaTypeToHtmlInputType = (type) => {
   if (type.startsWith('Int') || type.startsWith('Uint')) {
@@ -134,7 +135,8 @@ const scillaTypeToHtmlInputType = (type) => {
     type.startsWith('Option') ||
     type.startsWith('Bool') ||
     type.startsWith('Pair') ||
-    type.startsWith('List')
+    type.startsWith('List') ||
+    type in adtMap
   ) {
     return 'textarea';
   }
@@ -170,6 +172,10 @@ onMounted(async () => {
         label: `${t.vname} (${t.params.map(param => `${param.vname}: ${param.type}`).join(',')})`
       };
     });
+
+    abi.ADTs.forEach((adt) => {
+      adtMap[adt.tname] = adt
+    });
   } catch (error) {
     q.notify({
       type: 'negative',
@@ -180,8 +186,8 @@ onMounted(async () => {
 
 const callTransition = async () => {
   const contractsStore = useContractsStore();
-  const transitionName = selectedTransition.value.vname;
-  if (transitionName === '') {
+  const transitionName = selectedTransition.value.value.vname;
+  if (transitionName === '' || transitionName === undefined) {
     q.notify({
       type: 'negative',
       message: 'Not possible to call an empty transition',
@@ -225,6 +231,10 @@ const callTransition = async () => {
   }
 };
 
+const adtCNameToConstructorValue = (cname) => {
+  return `${props.contract.address.toLowerCase()}.${cname.split('.')[1]}`
+}
+
 const transitionChanged = ({value}) => {
   transitionsParameters.value = {};
   transitions2[value.vname].params.forEach((param) => {
@@ -245,6 +255,12 @@ const transitionChanged = ({value}) => {
     } else if (param.type.startsWith('Option')) {
       transitionsParameters.value[param.vname] = {
         constructor: 'None',
+        argtypes: [''],
+        arguments: [],
+      };
+    } else if (param.type in adtMap) {
+      transitionsParameters.value[param.vname] = {
+        constructor: adtCNameToConstructorValue(adtMap[param.type].tname),
         argtypes: [''],
         arguments: [],
       };
