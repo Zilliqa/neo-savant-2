@@ -154,6 +154,33 @@ export const useBlockchainStore = defineStore('blockchain', {
         state.selectedNetwork.msgVersion
       );
     },
+    getExplorerLinkForTx: (state) => {
+      return (txHash: string) => {
+        if (
+          state.selectedNetwork === null ||
+          !state.selectedNetwork.txQueryLink
+        ) {
+          return null;
+        }
+
+        return state.selectedNetwork.txQueryLink.replace('{TX}', txHash);
+      };
+    },
+    getExplorerLinkForContract: (state) => {
+      return (address: string) => {
+        if (
+          state.selectedNetwork === null ||
+          !state.selectedNetwork.contractQueryLink
+        ) {
+          return null;
+        }
+
+        return state.selectedNetwork.contractQueryLink.replace(
+          '{CONTRACT}',
+          address
+        );
+      };
+    },
   },
   actions: {
     setManagedByZilpay(managed: boolean) {

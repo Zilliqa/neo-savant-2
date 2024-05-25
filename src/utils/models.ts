@@ -7,6 +7,8 @@ export interface Network {
   msgVersion: number;
   faucet?: string;
   explorer?: string;
+  txQueryLink?: string; // In the explorer
+  contractQueryLink?: string; // In the explorer
 }
 
 export interface Contract {

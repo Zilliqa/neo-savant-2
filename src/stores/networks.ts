@@ -14,6 +14,10 @@ export const useNetworksStore = defineStore('networks', {
           'https://dev-wallet.zilliqa.com/faucet?address={ADDRESS}&network=isolated_server',
         explorer:
           'https://devex.zilliqa.com/?network=https://zilliqa-isolated-server.zilliqa.com/',
+        txQueryLink:
+          'https://devex.zilliqa.com/tx/{TX}?network=https://zilliqa-isolated-server.zilliqa.com/',
+        contractQueryLink:
+          'https://devex.zilliqa.com/address/{CONTRACT}?network=https://zilliqa-isolated-server.zilliqa.com/',
       },
       {
         name: 'Testnet',
@@ -24,6 +28,10 @@ export const useNetworksStore = defineStore('networks', {
           'https://dev-wallet.zilliqa.com/faucet?address={ADDRESS}&network=testnet',
         explorer:
           'https://devex.zilliqa.com/?network=https://dev-api.zilliqa.com',
+        txQueryLink:
+          'https://devex.zilliqa.com/tx/{TX}?network=https://dev-api.zilliqa.com',
+        contractQueryLink:
+          'https://devex.zilliqa.com/address/{CONTRACT}?network=https://dev-api.zilliqa.com',
       },
       {
         name: 'Mainnet',
@@ -53,7 +61,9 @@ export const useNetworksStore = defineStore('networks', {
       url: string,
       chainId: number,
       faucet?: string,
-      explorer?: string
+      explorer?: string,
+      txQueryLink?: string,
+      contractQueryLink?: string
     ) {
       if (this.getByName(name) !== undefined) {
         throw new Error('There is already another network with the same name.');
@@ -65,6 +75,8 @@ export const useNetworksStore = defineStore('networks', {
         msgVersion: 1,
         faucet,
         explorer,
+        txQueryLink,
+        contractQueryLink,
       });
     },
     deleteNetwork(name: string) {
