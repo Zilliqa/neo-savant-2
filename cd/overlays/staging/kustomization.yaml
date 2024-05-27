@@ -17,6 +17,19 @@ patches:
       - op: replace
         path: "/spec/rules/0/host"
         value: ide2.zilstg.dev
+      - op: add
+        path: "/spec/rules/1"
+        value:
+          host: stg-ide.zilliqa.com
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: neo-savant-2
+                    port:
+                      number: 80
       - op: replace
         path: /metadata/annotations
         value:
