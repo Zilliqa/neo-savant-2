@@ -53,6 +53,22 @@
             hint="Optional"
             v-model="explorer"
           />
+          <q-input
+            filled
+            dense
+            class="col"
+            label="Network Explorer - Tx Query URL"
+            hint="Optional. Add a {TX} to the URL. It'll be replaced with the transaction hash"
+            v-model="txQueryLink"
+          />
+          <q-input
+            filled
+            dense
+            class="col"
+            label="Network Explorer - Contract Query URL"
+            hint="Optional. Add a {CONTRACT} to the URL. It'll be replaced with the transaction hash"
+            v-model="contractQueryLink"
+          />
         </div>
       </q-card-section>
       <q-separator />
@@ -86,6 +102,8 @@ const url = ref('');
 const chaiId = ref(0);
 const faucet = ref('');
 const explorer = ref('');
+const txQueryLink = ref('');
+const contractQueryLink = ref('');
 
 const addIsDisabled = computed(() => {
   return name.value === '' && url.value === '' && chaiId.value === 0;
@@ -95,7 +113,15 @@ const addNetwork = () => {
   const faucetUrl = faucet.value === '' ? undefined : faucet.value;
   const explorerUrl = explorer.value === '' ? undefined : explorer.value;
   try {
-    store.addNetwork(name.value, url.value, chaiId.value, faucetUrl, explorerUrl);
+    store.addNetwork(
+      name.value,
+      url.value,
+      chaiId.value,
+      faucetUrl,
+      explorerUrl,
+      txQueryLink.value === '' ? undefined : txQueryLink.value,
+      contractQueryLink.value === '' ? undefined : contractQueryLink.value
+    );
     quasar.notify({
       type: 'positive',
       message: `${name.value} added to the networks.`,

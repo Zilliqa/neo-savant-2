@@ -3,7 +3,7 @@
     <q-item-section>
       <q-item-label class="row items-center justify-between">
         <div class="text-bold q-mr-sm">{{ props.contract.name }}</div>
-        <contract-list-item-actions :contract="props.contract"/>
+        <contract-list-item-actions :contract="props.contract" />
       </q-item-label>
       <q-item-label caption>
         <div class="row items-center">
@@ -11,6 +11,9 @@
             :text="props.contract.address"
             :length="24"
             :position="12"
+            :link="
+              blockchainStore.getExplorerLinkForContract(props.contract.address)
+            "
           />
           <copy-to-clipboard-btn :content="props.contract.address" />
         </div>
@@ -20,15 +23,17 @@
 </template>
 
 <script setup lang="ts">
-import ContractListItemActions from './ContractListItemActions.vue'
+import ContractListItemActions from './ContractListItemActions.vue';
 import TruncatedText from 'components/TruncatedText.vue';
 import CopyToClipboardBtn from 'components/CopyToClipboardBtn.vue';
 import ContractDetailsDialog from '../ContractDetailsDialog.vue';
+import { useBlockchainStore } from 'src/stores/blockchain';
 
 import { useQuasar } from 'quasar';
 
 const q = useQuasar();
-const props = defineProps(['contract'])
+const props = defineProps(['contract']);
+const blockchainStore = useBlockchainStore();
 
 const openDetails = () => {
   q.dialog({
@@ -37,5 +42,5 @@ const openDetails = () => {
       contract: props.contract,
     },
   });
-}
+};
 </script>
