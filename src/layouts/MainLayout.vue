@@ -25,10 +25,7 @@
       bordered
       v-if="contractsStore.selected"
     >
-      <contract-details-dialog
-        class="row"
-        :contract="contractsStore.selected"
-      />
+      <contract-details-panel :contract="contractsStore.selected" />
       <div
         v-touch-pan.preserveCursor.prevent.mouse.horizontal="resizeRightDrawer"
         class="q-drawer__resizer_right"
@@ -44,7 +41,7 @@
 import { ref } from 'vue';
 import LeftSidebar from 'components/LeftSidebar/LeftSidebar.vue';
 import MenuBar from 'src/components/header/MenuBar/MenuBar.vue';
-import ContractDetailsDialog from 'src/components/LeftSidebar/ContractsList/ContractDetailsDialog.vue';
+import ContractDetailsPanel from 'src/components/RightSidebar/ContractDetailsPanel.vue';
 import { useContractsStore } from 'src/stores/contracts';
 
 const contractsStore = useContractsStore();

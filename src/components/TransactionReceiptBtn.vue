@@ -1,7 +1,6 @@
 <template>
   <q-btn
     size="12px"
-    :loading="loading"
     flat
     dense
     round
@@ -24,7 +23,5 @@ const showTransactionReceiptDialog = () => {
     component: TransactionReceiptDialog,
     componentProps: { txHash: props.txHash },
   });
-
-}
-
+};
 </script>

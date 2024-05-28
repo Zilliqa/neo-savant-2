@@ -32,8 +32,8 @@
 </template>
 <script setup>
 import { ref } from 'vue';
-import CallTransitionDialog from './CallTransitionDialog.vue';
-import ContractStateDialog from './ContractStateDialog.vue';
+import CallTransitionDialog from './CallTransitionCard.vue';
+import ContractStateDialog from './ContractStateCard.vue';
 import ContractGeneralInfoCard from './ContractGeneralInfoCard.vue';
 import ContractDetailsTitleBar from './ContractDetailsTitleBar.vue';
 
