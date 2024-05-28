@@ -1,12 +1,17 @@
 <template>
   <q-list dense separator>
     <div v-for="contract in store.pending" :key="contract.txHash">
-      <pending-contract-list-item :contract="contract"/>
+      <pending-contract-list-item :contract="contract" />
       <q-separator />
     </div>
     <template v-if="blockchainStore.selectedNetwork">
-      <div v-for="contract in store.contractsForNetwork(blockchainStore.selectedNetwork.name)" :key="contract.address">
-        <contract-list-item :contract="contract"/>
+      <div
+        v-for="contract in store.contractsForNetwork(
+          blockchainStore.selectedNetwork.name
+        )"
+        :key="contract.address"
+      >
+        <contract-list-item :contract="contract" />
         <q-separator />
       </div>
     </template>
@@ -17,8 +22,8 @@
 <script setup lang="ts">
 import { useContractsStore } from 'src/stores/contracts';
 import { onMounted, onUnmounted } from 'vue';
-import ContractListItem from 'components/LeftSidebar/ContractsList/item/ContractListItem.vue'
-import PendingContractListItem from 'components/LeftSidebar/ContractsList/item/PendingContractListItem.vue'
+import ContractListItem from 'components/LeftSidebar/ContractsList/item/ContractListItem.vue';
+import PendingContractListItem from 'components/LeftSidebar/ContractsList/item/PendingContractListItem.vue';
 import { useBlockchainStore } from 'src/stores/blockchain';
 
 const store = useContractsStore();
@@ -32,7 +37,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => clearInterval(intervalId));
-
 </script>
 
 <style lang=""></style>

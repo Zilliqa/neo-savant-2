@@ -9,7 +9,7 @@
       icon="ios_share"
       @click="deployContract"
     >
-      <user-network-not-selected />
+      <user-network-not-selected-alarm />
     </q-btn>
     <q-btn
       dense
@@ -99,10 +99,11 @@ import {
 } from 'src/scilla';
 import { useQuasar } from 'quasar';
 import { useFilesStore } from 'src/stores/files';
+import UserNetworkNotSelectedAlarm from '../UserNetworkNotSelectedAlarm.vue';
 
 const cm: Ref<InstanceType<typeof CodeMirror> | undefined> = ref();
-const props = defineProps(['contract'])
-const code = ref('')
+const props = defineProps(['contract']);
+const code = ref('');
 let _toggleSearchPanel = false;
 const linterIsEnabled = ref(true);
 const q = useQuasar();
@@ -113,11 +114,11 @@ const showHideHints = ref(false);
 let editorView: EditorView;
 
 onMounted(() => {
-  editorView = cm.value.view
+  editorView = cm.value.view;
   if (props.contract) {
-    code.value = props.contract.code
+    code.value = props.contract.code;
   }
-})
+});
 
 const toggleSearchPanel = () => {
   _toggleSearchPanel = !_toggleSearchPanel;

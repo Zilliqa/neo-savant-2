@@ -10,8 +10,17 @@ export const useContractsStore = defineStore('contracts', {
     contracts: [] as Contract[],
     pending: [] as PendingContract[],
     transitionCalls: {} as TransitionCalls,
+    selected: null as Contract | null,
   }),
   actions: {
+    setSelected(name: string) {
+      const contract = this.getByName(name);
+      if (contract === undefined) {
+        throw new Error(`No contract with name of ${name}`);
+      }
+
+      this.selected = contract;
+    },
     async callTransition(
       contractAddress: string,
       transitionName: string,
