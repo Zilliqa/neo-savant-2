@@ -1,5 +1,13 @@
 <template>
-  <q-item clickable @click="openDetails">
+  <q-item
+    clickable
+    @click="openDetails"
+    :active="
+      contractsStore.selected &&
+      contractsStore.selected.name === props.contract.name
+    "
+    active-class="bg-teal-1 text-grey-8"
+  >
     <q-item-section>
       <q-item-label class="row items-center justify-between">
         <div class="text-bold q-mr-sm">{{ props.contract.name }}</div>

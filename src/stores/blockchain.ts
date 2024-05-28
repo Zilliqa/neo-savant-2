@@ -296,4 +296,10 @@ export const useBlockchainStore = defineStore('blockchain', {
       return txnId;
     },
   },
+  persist: {
+    paths: ['selectedNetwork'],
+    afterRestore: (context) => {
+      context.store.zilliqa = new Zilliqa(context.store.selectedNetwork.url);
+    },
+  },
 });

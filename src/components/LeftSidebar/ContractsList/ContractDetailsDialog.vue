@@ -1,4 +1,5 @@
 <template>
+  <contract-details-title-bar :contract-name="props.contract.name" />
   <q-tabs
     v-model="tab"
     dense
@@ -15,8 +16,8 @@
 
   <q-separator />
 
-  <q-tab-panels v-model="tab" animated class="bg-yellow row">
-    <q-tab-panel name="general_info" class="q-pa-none bg-green">
+  <q-tab-panels v-model="tab" animated class="row">
+    <q-tab-panel name="general_info" class="q-pa-none">
       <contract-general-info-card :address="props.contract.address" />
     </q-tab-panel>
 
@@ -34,6 +35,7 @@ import { ref } from 'vue';
 import CallTransitionDialog from './CallTransitionDialog.vue';
 import ContractStateDialog from './ContractStateDialog.vue';
 import ContractGeneralInfoCard from './ContractGeneralInfoCard.vue';
+import ContractDetailsTitleBar from './ContractDetailsTitleBar.vue';
 
 const props = defineProps(['contract']);
 

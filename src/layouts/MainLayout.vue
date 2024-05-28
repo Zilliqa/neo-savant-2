@@ -54,7 +54,7 @@ const rightDrawerOpen = ref(true);
 let initialLeftDrawerWidth = 300;
 let initialRightDrawerWidth = 300;
 const leftDrawerWidth = ref(300);
-const rightDrawerWidth = ref(300);
+const rightDrawerWidth = ref(500);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const resizeLeftDrawer = (ev: any) => {
