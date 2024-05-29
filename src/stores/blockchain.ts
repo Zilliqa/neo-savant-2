@@ -7,6 +7,7 @@ import { TxParams, Zilliqa, toChecksumAddress } from '@zilliqa-js/zilliqa';
 import { useTransactionsStore } from './transactions';
 import Long from 'long';
 import { zilpayHelper } from 'src/utils';
+import { ledgerHelper } from 'src/utils';
 
 export const useBlockchainStore = defineStore('blockchain', {
   state: () => ({
@@ -14,6 +15,7 @@ export const useBlockchainStore = defineStore('blockchain', {
     selectedNetwork: null as Network | null,
     zilliqa: null as Zilliqa | null,
     managedByZilpay: false,
+    managedByLedger: false,
   }),
   getters: {
     getBalance: (state) => {
@@ -191,6 +193,14 @@ export const useBlockchainStore = defineStore('blockchain', {
         accountsStore.remove('Zilpay');
       }
     },
+    setManagedByLedger(managed: boolean) {
+      this.managedByLedger = managed;
+      if (!managed) {
+        this.selectedAccount = null;
+        const accountsStore = useAccountsStore();
+        accountsStore.remove('Ledger');
+      }
+    },
     addKeystoreAccount(account: KeystoreAccount) {
       if (this.zilliqa === null) {
         throw new Error('Please select a network.');
@@ -272,15 +282,22 @@ export const useBlockchainStore = defineStore('blockchain', {
         true
       );
 
-      let txn;
       let txnId: string;
       if (this.managedByZilpay) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        txn = await zilpayHelper.signTx(tx as any);
+        const txn = await zilpayHelper.signTx(tx as any);
         txnId = txn.ID;
-        console.log(txn);
+      } else if (this.managedByLedger) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sig = (await ledgerHelper.signTx(tx.txParams)).sig;
+        const payload = JSON.stringify({
+          ...tx.txParams,
+          signature: sig,
+        });
+        txnId = await this.zilliqa.blockchain.createTransactionRaw(payload);
       } else {
-        txn = await this.zilliqa.blockchain.createTransactionWithoutConfirm(tx);
+        const txn =
+          await this.zilliqa.blockchain.createTransactionWithoutConfirm(tx);
         txnId = txn.id || 'NO_ID';
       }
 
