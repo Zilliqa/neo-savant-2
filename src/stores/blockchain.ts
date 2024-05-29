@@ -299,7 +299,9 @@ export const useBlockchainStore = defineStore('blockchain', {
   persist: {
     paths: ['selectedNetwork'],
     afterRestore: (context) => {
-      context.store.zilliqa = new Zilliqa(context.store.selectedNetwork.url);
+      if (context.store.selectedNetwork) {
+        context.store.zilliqa = new Zilliqa(context.store.selectedNetwork.url);
+      }
     },
   },
 });
