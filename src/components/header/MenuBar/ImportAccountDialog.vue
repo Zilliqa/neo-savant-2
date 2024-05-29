@@ -97,25 +97,15 @@
         </q-tab-panel>
 
         <q-tab-panel name="ledger">
-          <q-option-group
-            v-model="ledgerTransportType"
-            :options="[
-              {
-                label: 'Bluetooth',
-                value: 'Bluetooth',
-              },
-              {
-                label: 'WebUSB',
-                value: 'WebUSB',
-              },
-              {
-                label: 'WebHID',
-                value: 'WebHID',
-              },
-            ]"
-            color="primary"
-            inline
-          />
+          <div class="row items-center q-gutter-x-sm">
+            <div class="text-bold text-grey-7">Transport Protocol:</div>
+            <q-option-group
+              v-model="ledgerTransportType"
+              :options="ledgerTransportTypes"
+              color="primary"
+              inline
+            />
+          </div>
         </q-tab-panel>
       </q-tab-panels>
 
@@ -131,12 +121,12 @@
 
 <script setup lang="ts">
 import { Account } from '@zilliqa-js/account';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'stores/accounts';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
-import { readFileAsText } from 'src/utils';
+import { LedgerHelper, LedgerTransportType, readFileAsText } from 'src/utils';
 import { zilpayHelper } from 'src/utils';
 
 const secret = ref('');
@@ -149,12 +139,34 @@ const networksStore = useNetworksStore();
 const blockchainStore = useBlockchainStore();
 const show = ref(true);
 const tab = ref('privatekey');
-const ledgerTransportType = ref('bluetooth');
+const ledgerTransportType = ref<undefined | string>(undefined);
+const ledgerTransportTypes = ref<
+  { label: string; value: string; disable: boolean }[]
+>([]);
 const forNetworks = ref<string[]>(
   blockchainStore.selectedNetwork === null
     ? []
     : [blockchainStore.selectedNetwork.name]
 );
+
+onMounted(async () => {
+  for (const type of Object.keys(LedgerTransportType)) {
+    const supported = await LedgerHelper.isTransportSupported(
+      type as LedgerTransportType
+    );
+
+    if (ledgerTransportType.value === undefined && supported) {
+      ledgerTransportType.value = type;
+    }
+
+    ledgerTransportTypes.value.push({
+      label: type,
+      value: type,
+      disable: !supported,
+    });
+  }
+});
+
 const networkNames = computed(() => {
   return networksStore.networks.map((network) => network.name);
 });

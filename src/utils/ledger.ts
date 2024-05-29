@@ -22,9 +22,9 @@ const HashByteLen = 32;
 const Bech32AddrLen = 'zil'.length + 1 + 32 + 6;
 
 export enum LedgerTransportType {
-  WebUSB,
-  WebHID,
-  Bluetooth,
+  WebUSB = 'WebUSB',
+  WebHID = 'WebHID',
+  Bluetooth = 'Bluetooth',
 }
 
 export class LedgerHelper {
