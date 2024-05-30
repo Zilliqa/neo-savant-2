@@ -43,7 +43,7 @@ export interface Account {
   address: string;
   bech32Address: string;
   balance: string;
-  account: KeystoreAccount | PrivatekeyAccount | ZilpayAccount;
+  account: KeystoreAccount | PrivatekeyAccount | ZilpayAccount | LedgerAccount;
   networks: string[];
 }
 
@@ -73,4 +73,8 @@ export interface ScillaContract {
 
 export interface ZilpayAccount {
   zilpay: ZilPay;
+}
+
+export interface LedgerAccount {
+  index: number;
 }

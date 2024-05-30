@@ -97,14 +97,29 @@
         </q-tab-panel>
 
         <q-tab-panel name="ledger">
-          <div class="row items-center q-gutter-x-sm">
-            <div class="text-bold text-grey-7">Transport Protocol:</div>
-            <q-option-group
-              v-model="ledgerTransportType"
-              :options="ledgerTransportTypes"
-              color="primary"
-              inline
-            />
+          <div class="column">
+            <div class="row items-center q-gutter-x-sm">
+              <q-select
+                class="col-3"
+                dense
+                outlined
+                v-model="ledgerTransportType"
+                :options="ledgerTransportTypes"
+                inline
+              />
+              <q-btn class="col" no-caps color="dark">Connect</q-btn>
+              <q-space />
+              <q-input
+                outlined
+                v-model="ledgerIndex"
+                dense
+                type="number"
+                label="Index"
+                class="col"
+              >
+              </q-input>
+              <q-btn class="col" no-caps color="dark">Import</q-btn>
+            </div>
           </div>
         </q-tab-panel>
       </q-tab-panels>
@@ -126,7 +141,12 @@ import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'stores/accounts';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
-import { LedgerHelper, LedgerTransportType, readFileAsText } from 'src/utils';
+import {
+  LedgerHelper,
+  LedgerTransportType,
+  ledgerHelper,
+  readFileAsText,
+} from 'src/utils';
 import { zilpayHelper } from 'src/utils';
 
 const secret = ref('');
@@ -148,6 +168,8 @@ const forNetworks = ref<string[]>(
     ? []
     : [blockchainStore.selectedNetwork.name]
 );
+
+const ledgerIndex = ref(0);
 
 onMounted(async () => {
   for (const type of Object.keys(LedgerTransportType)) {
@@ -179,6 +201,8 @@ const importAccount = async () => {
       return await loadKeystore();
     case 'zilpay':
       return await connectToZilpay();
+    case 'ledger':
+      return await connectToLedger();
   }
 };
 
@@ -247,6 +271,24 @@ const connectToZilpay = async () => {
     q.notify({
       type: 'negative',
       message: `Failed to connect to Zilpay. ${error}`,
+    });
+  }
+};
+
+const connectToLedger = async () => {
+  try {
+    await ledgerHelper.connect(
+      ledgerTransportType.value as LedgerTransportType
+    );
+    q.notify({
+      type: 'info',
+      message: 'Successfully connected to Ledger!',
+    });
+    show.value = false;
+  } catch (error) {
+    q.notify({
+      type: 'negative',
+      message: `Failed to connect to Ledger. ${error}`,
     });
   }
 };
