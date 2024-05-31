@@ -5,7 +5,7 @@
       style="height: 30px"
     />
     <div class="text-weight-bolder text-h6">Neo Savant</div>
-    <q-separator color="grey-9" vertical class="q-ml-sm"/>
+    <q-separator color="grey-9" vertical class="q-ml-sm" />
     <q-btn dense flat label="Tools" no-caps icon="construction">
       <q-menu auto-close>
         <q-list dense>
@@ -34,15 +34,19 @@
         </q-list>
       </q-menu>
     </q-btn>
-    <template
-      v-if="explorerLink !== ''"
-    >
-      <q-btn dense flat label="Network Explorer" no-caps icon="dns" :href="explorerLink" target="_blank"/>
+    <template v-if="explorerLink !== ''">
+      <q-btn
+        dense
+        flat
+        label="Network Explorer"
+        no-caps
+        icon="dns"
+        :href="explorerLink"
+        target="_blank"
+      />
       <q-separator vertical />
     </template>
-    <template
-      v-if="faucetLink !== ''"
-    >
+    <template v-if="faucetLink !== ''">
       <q-btn
         dense
         flat
@@ -64,6 +68,9 @@
           </q-item>
           <q-item clickable @click="openURL('https://learnscilla.com/')">
             <q-item-section>Tutorial</q-item-section>
+          </q-item>
+          <q-item clickable @click="showAboutDialog()">
+            <q-item-section>About</q-item-section>
           </q-item>
         </q-list>
       </q-menu>
@@ -96,20 +103,27 @@ const q = useQuasar();
 const blockchain = useBlockchainStore();
 
 const faucetLink = computed(() => {
-  if (!blockchain.selectedNetwork || !blockchain.selectedNetwork.faucet || !blockchain.selectedAccount) {
+  if (
+    !blockchain.selectedNetwork ||
+    !blockchain.selectedNetwork.faucet ||
+    !blockchain.selectedAccount
+  ) {
     return '';
   }
 
-  return blockchain.selectedNetwork.faucet.replace('{ADDRESS}', blockchain.selectedAccount.bech32Address)
-})
+  return blockchain.selectedNetwork.faucet.replace(
+    '{ADDRESS}',
+    blockchain.selectedAccount.bech32Address
+  );
+});
 
 const explorerLink = computed(() => {
   if (!blockchain.selectedNetwork || !blockchain.selectedNetwork.explorer) {
     return '';
   }
 
-  return blockchain.selectedNetwork.explorer
-})
+  return blockchain.selectedNetwork.explorer;
+});
 
 function showUnitConvertor() {
   q.dialog({
@@ -132,6 +146,14 @@ function showKeystoreGenerator() {
 function showTransferZilDialog() {
   q.dialog({
     component: TransferZilDialog,
+  });
+}
+
+function showAboutDialog() {
+  q.dialog({
+    title: 'Neo Savant 2.1.0',
+    message:
+      'Neo Savant is Zilliqa IDE that allows you to write, deploy and interact with smart contracts on the Zilliqa blockchain.',
   });
 }
 </script>
