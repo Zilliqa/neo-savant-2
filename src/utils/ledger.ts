@@ -68,7 +68,6 @@ export class LedgerHelper {
 
       default:
         throw new Error(`${transportType} is not a supported transport type.`);
-        break;
     }
   }
 
