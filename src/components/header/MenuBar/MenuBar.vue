@@ -151,7 +151,7 @@ function showTransferZilDialog() {
 
 function showAboutDialog() {
   q.dialog({
-    title: 'Neo Savant 0.1.0',
+    title: 'Neo Savant 2.1.0',
     message:
       'Neo Savant is Zilliqa IDE that allows you to write, deploy and interact with smart contracts on the Zilliqa blockchain.',
   });
