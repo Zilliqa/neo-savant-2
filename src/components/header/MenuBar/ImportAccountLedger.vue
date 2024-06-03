@@ -33,24 +33,6 @@
       :columns="columns"
       row-key="name"
     >
-      <template v-slot:body="props">
-        <q-tr :props="props">
-          <q-td key="index" :props="props">{{ props.row.index }}</q-td>
-          <q-td key="name" :props="props">
-            {{ props.row.name }}
-            <q-popup-edit v-model="props.row.name" v-slot="scope">
-              <q-input
-                v-model="scope.value"
-                dense
-                autofocus
-                @keyup.enter="scope.set"
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="address" :props="props">{{ props.row.address }}</q-td>
-          <q-td key="balance" :props="props">{{ props.row.balance }}</q-td>
-        </q-tr>
-      </template>
     </q-table>
   </div>
 </template>
@@ -61,6 +43,7 @@ import { LedgerHelper, LedgerTransportType, ledgerHelper } from 'src/utils';
 import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'src/stores/accounts';
 import { useBlockchainStore } from 'src/stores/blockchain';
+import { fromBech32Address } from '@zilliqa-js/crypto';
 
 const ledgerTransportType = ref<undefined | string>(undefined);
 const ledgerTransportTypes = ref<
@@ -156,6 +139,15 @@ const importLedgerAccount = async () => {
       address: account.pubAddr,
       balance: await blockchainStore.getBalance(account.pubAddr),
     });
+    accountsStore.add(
+      accountName.value,
+      fromBech32Address(account.pubAddr),
+      account.pubAddr,
+      [blockchainStore.selectedNetworkName],
+      {
+        index: ledgerIndex.value,
+      }
+    );
     ledgerIndex.value += 1;
     accountName.value = `Ledger ${ledgerIndex.value}`;
   } catch (error) {
