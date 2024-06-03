@@ -71,9 +71,9 @@ export class LedgerHelper {
     }
   }
 
-  async signTx(txParams: TxParams) {
+  async signTx(keyIndex: number, txParams: TxParams) {
     if (this.ledgerInterface) {
-      return this.ledgerInterface.signTxn(0, txParams);
+      return this.ledgerInterface.signTxn(keyIndex, txParams);
     } else {
       throw new Error('Ledger is not initialized.');
     }

@@ -38,11 +38,19 @@ export interface Tag {
   color: string;
 }
 
+export enum AccountType {
+  KEYSTORE,
+  PRIVATEKEY,
+  ZILPAY,
+  LEDGER,
+}
+
 export interface Account {
   name: string;
   address: string;
   bech32Address: string;
   balance: string;
+  accountType: AccountType;
   account: KeystoreAccount | PrivatekeyAccount | ZilpayAccount | LedgerAccount;
   networks: string[];
 }
@@ -77,4 +85,5 @@ export interface ZilpayAccount {
 
 export interface LedgerAccount {
   index: number;
+  publicKey: string;
 }

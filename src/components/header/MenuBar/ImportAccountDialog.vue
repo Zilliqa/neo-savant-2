@@ -104,7 +104,7 @@
       <q-separator />
       <q-card-actions align="right" class="bg-grey-2">
         <q-btn no-caps flat color="primary" @click="importAccount">{{
-          tab !== 'zilpay' ? 'Import' : 'Connect'
+          actionBtn
         }}</q-btn>
       </q-card-actions>
     </q-card>
@@ -118,7 +118,7 @@ import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'stores/accounts';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
-import { readFileAsText } from 'src/utils';
+import { AccountType, readFileAsText } from 'src/utils';
 import { zilpayHelper } from 'src/utils';
 import ImportAccountLedger from './ImportAccountLedger.vue';
 
@@ -142,6 +142,16 @@ const networkNames = computed(() => {
   return networksStore.networks.map((network) => network.name);
 });
 
+const actionBtn = computed(() => {
+  if (tab.value === 'ledger') {
+    return 'Close';
+  } else if (tab.value === 'zilpay') {
+    return 'Connect';
+  } else {
+    return 'Import';
+  }
+});
+
 const importAccount = async () => {
   switch (tab.value) {
     case 'privatekey':
@@ -150,6 +160,8 @@ const importAccount = async () => {
       return await loadKeystore();
     case 'zilpay':
       return await connectToZilpay();
+    case 'ledger':
+      return (show.value = false);
   }
 };
 
@@ -160,6 +172,7 @@ const loadPrivateKey = () => {
     account.address,
     account.bech32Address,
     forNetworks.value,
+    AccountType.PRIVATEKEY,
     {
       privateKey: privateKey.value,
     }
@@ -188,6 +201,7 @@ const loadKeystore = async () => {
       account.address,
       account.bech32Address,
       forNetworks.value,
+      AccountType.KEYSTORE,
       {
         keystore: keystore.toString(),
         passphrase: secret.value,

@@ -39,7 +39,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { LedgerHelper, LedgerTransportType, ledgerHelper } from 'src/utils';
+import {
+  AccountType,
+  LedgerHelper,
+  LedgerTransportType,
+  ledgerHelper,
+} from 'src/utils';
 import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'src/stores/accounts';
 import { useBlockchainStore } from 'src/stores/blockchain';
@@ -144,8 +149,10 @@ const importLedgerAccount = async () => {
       fromBech32Address(account.pubAddr),
       account.pubAddr,
       [blockchainStore.selectedNetworkName],
+      AccountType.LEDGER,
       {
         index: ledgerIndex.value,
+        publicKey: account.publicKey,
       }
     );
     ledgerIndex.value += 1;

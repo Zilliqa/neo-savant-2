@@ -7,6 +7,7 @@ import {
 
 import { useBlockchainStore } from 'src/stores/blockchain';
 import { useAccountsStore } from 'src/stores/accounts';
+import { AccountType } from './models';
 
 declare global {
   interface Window {
@@ -83,6 +84,7 @@ export class ZilpayHelper {
       defaultAccount.base16,
       defaultAccount.bech32,
       [this.zilpayNetToOurNet(net)],
+      AccountType.ZILPAY,
       {
         zilpay: window.zilPay,
       }
