@@ -38,12 +38,20 @@ export interface Tag {
   color: string;
 }
 
+export enum AccountType {
+  KEYSTORE,
+  PRIVATEKEY,
+  ZILPAY,
+  LEDGER,
+}
+
 export interface Account {
   name: string;
   address: string;
   bech32Address: string;
   balance: string;
-  account: KeystoreAccount | PrivatekeyAccount | ZilpayAccount;
+  accountType: AccountType;
+  account: KeystoreAccount | PrivatekeyAccount | ZilpayAccount | LedgerAccount;
   networks: string[];
 }
 
@@ -73,4 +81,9 @@ export interface ScillaContract {
 
 export interface ZilpayAccount {
   zilpay: ZilPay;
+}
+
+export interface LedgerAccount {
+  index: number;
+  publicKey: string;
 }

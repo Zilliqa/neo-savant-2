@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
 import {
   Account,
+  AccountType,
   KeystoreAccount,
+  LedgerAccount,
   PrivatekeyAccount,
   ZilpayAccount,
 } from 'src/utils';
@@ -17,7 +19,12 @@ export const useAccountsStore = defineStore('accounts', {
       address: string,
       bech32Address: string,
       networks: string[],
-      account: KeystoreAccount | PrivatekeyAccount | ZilpayAccount
+      accountType: AccountType,
+      account:
+        | KeystoreAccount
+        | PrivatekeyAccount
+        | ZilpayAccount
+        | LedgerAccount
     ) {
       if (this.getByName(name) !== undefined) {
         throw new Error(
@@ -28,6 +35,7 @@ export const useAccountsStore = defineStore('accounts', {
         name,
         address,
         bech32Address,
+        accountType,
         account,
         networks,
         balance: '0',
@@ -37,6 +45,8 @@ export const useAccountsStore = defineStore('accounts', {
         blockchainStore.addKeystoreAccount(account);
       } else if ('zilpay' in account) {
         blockchainStore.setManagedByZilpay(true);
+      } else if ('index' in account) {
+        // Do nothing for leger account
       } else {
         blockchainStore.addAccount(account.privateKey);
       }

@@ -7,6 +7,7 @@ import {
 
 import { useBlockchainStore } from 'src/stores/blockchain';
 import { useAccountsStore } from 'src/stores/accounts';
+import { AccountType } from './models';
 
 declare global {
   interface Window {
@@ -83,6 +84,7 @@ export class ZilpayHelper {
       defaultAccount.base16,
       defaultAccount.bech32,
       [this.zilpayNetToOurNet(net)],
+      AccountType.ZILPAY,
       {
         zilpay: window.zilPay,
       }
@@ -118,6 +120,7 @@ export class ZilpayHelper {
     const result = await blockchain.createTransaction(tx);
     return result;
   }
+
   private subscribeToChanges() {
     const { wallet } = window.zilPay;
 
@@ -132,10 +135,8 @@ export class ZilpayHelper {
     this.observableNetwork = wallet.observableNetwork().subscribe(() => {
       this.updateSelectedNetwork();
       this.updateSelectedAccount();
-      console.log('there');
     });
     this.observableAccount = wallet.observableAccount().subscribe(() => {
-      console.log('here');
       this.updateSelectedAccount();
     });
   }

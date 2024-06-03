@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia';
-import { Account, KeystoreAccount, Network } from '../utils/models';
+import {
+  Account,
+  AccountType,
+  KeystoreAccount,
+  LedgerAccount,
+  Network,
+} from '../utils/models';
 import { useAccountsStore } from './accounts';
 import { useNetworksStore } from './networks';
 import { BN, bytes, units } from '@zilliqa-js/util';
@@ -7,6 +13,7 @@ import { TxParams, Zilliqa, toChecksumAddress } from '@zilliqa-js/zilliqa';
 import { useTransactionsStore } from './transactions';
 import Long from 'long';
 import { zilpayHelper } from 'src/utils';
+import { ledgerHelper } from 'src/utils';
 
 export const useBlockchainStore = defineStore('blockchain', {
   state: () => ({
@@ -29,6 +36,22 @@ export const useBlockchainStore = defineStore('blockchain', {
           return '0';
         } else {
           return units.fromQa(new BN(balance.result.balance), units.Units.Zil);
+        }
+      };
+    },
+    getNonce: (state) => {
+      return async (address: string) => {
+        if (state.zilliqa === null) {
+          throw new Error('Please select a network');
+        }
+        const balance = await state.zilliqa.blockchain.getBalance(address);
+        if (
+          balance === undefined ||
+          (balance.error && balance.error.code === -5)
+        ) {
+          return '0';
+        } else {
+          return balance.result.nonce;
         }
       };
     },
@@ -262,25 +285,62 @@ export const useBlockchainStore = defineStore('blockchain', {
         throw new Error('Please select an account.');
       }
 
-      const tx = this.zilliqa.transactions.new(
-        {
-          ...txParams,
-          version: this.selectedNetworkVersion,
-          code,
-          data,
-        },
-        true
-      );
-
-      let txn;
       let txnId: string;
       if (this.managedByZilpay) {
+        const tx = this.zilliqa.transactions.new(
+          {
+            ...txParams,
+            version: this.selectedNetworkVersion,
+            code,
+            data,
+          },
+          true
+        );
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        txn = await zilpayHelper.signTx(tx as any);
+        const txn = await zilpayHelper.signTx(tx as any);
         txnId = txn.ID;
-        console.log(txn);
+      } else if (this.selectedAccount.accountType === AccountType.LEDGER) {
+        const nonce = await this.getNonce(this.selectedAccount.address);
+        const pubKey = (this.selectedAccount.account as LedgerAccount)
+          .publicKey;
+        const tx = this.zilliqa.transactions.new(
+          {
+            ...txParams,
+            version: this.selectedNetworkVersion,
+            code,
+            data,
+            nonce: nonce + 1,
+            pubKey,
+            signature: '',
+          },
+          true
+        );
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const index = (this.selectedAccount.account as LedgerAccount).index;
+        const sig = (await ledgerHelper.signTx(index, tx.txParams)).sig;
+        const payload = JSON.stringify({
+          ...tx.txParams,
+          amount: tx.txParams.amount.toString(),
+          gasPrice: tx.txParams.gasPrice.toString(),
+          gasLimit: tx.txParams.gasLimit.toString(),
+          priority: true,
+          signature: sig,
+        });
+        txnId = await this.zilliqa.blockchain.createTransactionRaw(payload);
       } else {
-        txn = await this.zilliqa.blockchain.createTransactionWithoutConfirm(tx);
+        const tx = this.zilliqa.transactions.new(
+          {
+            ...txParams,
+            version: this.selectedNetworkVersion,
+            code,
+            data,
+          },
+          true
+        );
+        const txn =
+          await this.zilliqa.blockchain.createTransactionWithoutConfirm(tx);
         txnId = txn.id || 'NO_ID';
       }
 
