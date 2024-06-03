@@ -5,7 +5,7 @@
     :no-esc-dismiss="false"
     backdrop-filter="blur(4px)"
   >
-    <q-card style="width: 500px; max-width: 80vw">
+    <q-card style="width: 600px; max-width: 80vw">
       <q-tabs
         v-model="tab"
         dense
@@ -97,37 +97,14 @@
         </q-tab-panel>
 
         <q-tab-panel name="ledger">
-          <div class="column">
-            <div class="row items-center q-gutter-x-sm">
-              <q-select
-                class="col-3"
-                dense
-                outlined
-                v-model="ledgerTransportType"
-                :options="ledgerTransportTypes"
-                inline
-              />
-              <q-btn class="col" no-caps color="dark">Connect</q-btn>
-              <q-space />
-              <q-input
-                outlined
-                v-model="ledgerIndex"
-                dense
-                type="number"
-                label="Index"
-                class="col"
-              >
-              </q-input>
-              <q-btn class="col" no-caps color="dark">Import</q-btn>
-            </div>
-          </div>
+          <ImportAccountLedger />
         </q-tab-panel>
       </q-tab-panels>
 
       <q-separator />
       <q-card-actions align="right" class="bg-grey-2">
         <q-btn no-caps flat color="primary" @click="importAccount">{{
-          tab !== 'zilpay' && tab !== 'ledger' ? 'Import' : 'Connect'
+          tab !== 'zilpay' ? 'Import' : 'Connect'
         }}</q-btn>
       </q-card-actions>
     </q-card>
@@ -136,18 +113,14 @@
 
 <script setup lang="ts">
 import { Account } from '@zilliqa-js/account';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import { useAccountsStore } from 'stores/accounts';
 import { useNetworksStore } from 'stores/networks';
 import { useBlockchainStore } from 'src/stores/blockchain';
-import {
-  LedgerHelper,
-  LedgerTransportType,
-  ledgerHelper,
-  readFileAsText,
-} from 'src/utils';
+import { readFileAsText } from 'src/utils';
 import { zilpayHelper } from 'src/utils';
+import ImportAccountLedger from './ImportAccountLedger.vue';
 
 const secret = ref('');
 const keystoreFile = ref<File | null>(null);
@@ -159,35 +132,11 @@ const networksStore = useNetworksStore();
 const blockchainStore = useBlockchainStore();
 const show = ref(true);
 const tab = ref('privatekey');
-const ledgerTransportType = ref<undefined | string>(undefined);
-const ledgerTransportTypes = ref<
-  { label: string; value: string; disable: boolean }[]
->([]);
 const forNetworks = ref<string[]>(
   blockchainStore.selectedNetwork === null
     ? []
     : [blockchainStore.selectedNetwork.name]
 );
-
-const ledgerIndex = ref(0);
-
-onMounted(async () => {
-  for (const type of Object.keys(LedgerTransportType)) {
-    const supported = await LedgerHelper.isTransportSupported(
-      type as LedgerTransportType
-    );
-
-    if (ledgerTransportType.value === undefined && supported) {
-      ledgerTransportType.value = type;
-    }
-
-    ledgerTransportTypes.value.push({
-      label: type,
-      value: type,
-      disable: !supported,
-    });
-  }
-});
 
 const networkNames = computed(() => {
   return networksStore.networks.map((network) => network.name);
@@ -201,8 +150,6 @@ const importAccount = async () => {
       return await loadKeystore();
     case 'zilpay':
       return await connectToZilpay();
-    case 'ledger':
-      return await connectToLedger();
   }
 };
 
@@ -271,24 +218,6 @@ const connectToZilpay = async () => {
     q.notify({
       type: 'negative',
       message: `Failed to connect to Zilpay. ${error}`,
-    });
-  }
-};
-
-const connectToLedger = async () => {
-  try {
-    await ledgerHelper.connect(
-      ledgerTransportType.value as LedgerTransportType
-    );
-    q.notify({
-      type: 'info',
-      message: 'Successfully connected to Ledger!',
-    });
-    show.value = false;
-  } catch (error) {
-    q.notify({
-      type: 'negative',
-      message: `Failed to connect to Ledger. ${error}`,
     });
   }
 };

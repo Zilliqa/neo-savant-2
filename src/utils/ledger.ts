@@ -79,6 +79,16 @@ export class LedgerHelper {
     }
   }
 
+  async getPublicAddress(index: number): Promise<
+    | undefined
+    | {
+        pubAddr: string;
+        publicKey: string;
+      }
+  > {
+    return this.ledgerInterface?.getPublicAddress(index);
+  }
+
   disconnect() {
     return;
   }
@@ -131,7 +141,9 @@ class LedgerInterface {
     return { publicKey };
   }
 
-  async getPublicAddress(index: number) {
+  async getPublicAddress(
+    index: number
+  ): Promise<{ pubAddr: string; publicKey: string }> {
     const P1 = 0x00;
     const P2 = 0x01;
 
