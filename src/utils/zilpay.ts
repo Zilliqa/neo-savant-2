@@ -91,7 +91,7 @@ export class ZilpayHelper {
     );
 
     const blockchainStore = useBlockchainStore();
-    await blockchainStore.setSelectedAccount('Zilpay');
+    blockchainStore.setSelectedAccount('Zilpay');
   }
 
   private zilpayNetToOurNet(net: string) {

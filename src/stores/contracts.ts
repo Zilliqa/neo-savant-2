@@ -21,6 +21,9 @@ export const useContractsStore = defineStore('contracts', {
 
       this.selected = contract;
     },
+    deselect() {
+      this.selected = null;
+    },
     async callTransition(
       contractAddress: string,
       transitionName: string,

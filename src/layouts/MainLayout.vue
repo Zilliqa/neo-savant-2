@@ -25,6 +25,10 @@
       bordered
       v-if="contractsStore.selected"
     >
+      <contract-details-title-bar
+        :contract-name="contractsStore.selected.name"
+        @close="contractsStore.deselect()"
+      />
       <contract-details-panel :contract="contractsStore.selected" />
       <div
         v-touch-pan.preserveCursor.prevent.mouse.horizontal="resizeRightDrawer"
@@ -43,6 +47,7 @@ import LeftSidebar from 'components/LeftSidebar/LeftSidebar.vue';
 import MenuBar from 'src/components/header/MenuBar/MenuBar.vue';
 import ContractDetailsPanel from 'src/components/RightSidebar/ContractDetailsPanel.vue';
 import { useContractsStore } from 'src/stores/contracts';
+import ContractDetailsTitleBar from 'src/components/RightSidebar/ContractDetailsTitleBar.vue';
 
 const contractsStore = useContractsStore();
 const leftDrawerOpen = ref(false);
