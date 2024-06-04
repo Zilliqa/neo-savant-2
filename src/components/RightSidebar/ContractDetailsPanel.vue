@@ -1,5 +1,4 @@
 <template>
-  <contract-details-title-bar :contract-name="props.contract.name" />
   <q-tabs
     v-model="tab"
     dense
@@ -35,7 +34,6 @@ import { ref } from 'vue';
 import CallTransitionDialog from './CallTransitionCard.vue';
 import ContractStateDialog from './ContractStateCard.vue';
 import ContractGeneralInfoCard from './ContractGeneralInfoCard.vue';
-import ContractDetailsTitleBar from './ContractDetailsTitleBar.vue';
 
 const props = defineProps(['contract']);
 

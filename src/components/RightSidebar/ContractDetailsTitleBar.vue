@@ -6,6 +6,15 @@
         >contract</span
       ></q-toolbar-title
     >
+    <q-btn
+      dense
+      flat
+      rounded
+      no-caps
+      icon="close"
+      @click="$emit('close')"
+      color="white"
+    />
   </q-bar>
 </template>
 

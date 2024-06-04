@@ -4,7 +4,16 @@
       src="https://ide.zilliqa.com/img/logo.193e9b62.png"
       style="height: 30px"
     />
-    <div class="text-weight-bolder text-h6">Neo Savant</div>
+    <div class="text-weight-bolder text-h6">
+      <a
+        href="https://github.com/Zilliqa/neo-savant-2"
+        class="text-white"
+        target="_blank"
+        style="text-decoration: none"
+      >
+        Neo Savant <span class="text-orange text-weight-bolder">v2</span>
+      </a>
+    </div>
     <q-separator color="grey-9" vertical class="q-ml-sm" />
     <q-btn dense flat label="Tools" no-caps icon="construction">
       <q-menu auto-close>
@@ -68,6 +77,13 @@
           </q-item>
           <q-item clickable @click="openURL('https://learnscilla.com/')">
             <q-item-section>Tutorial</q-item-section>
+          </q-item>
+          <q-separator />
+          <q-item
+            clickable
+            @click="openURL('https://github.com/Zilliqa/neo-savant-2')"
+          >
+            <q-item-section>Github Repository</q-item-section>
           </q-item>
           <q-item clickable @click="showAboutDialog()">
             <q-item-section>About</q-item-section>
