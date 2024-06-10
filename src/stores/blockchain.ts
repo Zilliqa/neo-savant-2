@@ -14,6 +14,7 @@ import { useTransactionsStore } from './transactions';
 import Long from 'long';
 import { zilpayHelper } from 'src/utils';
 import { ledgerHelper } from 'src/utils';
+import { Notify } from 'quasar';
 
 export const useBlockchainStore = defineStore('blockchain', {
   state: () => ({
@@ -319,6 +320,22 @@ export const useBlockchainStore = defineStore('blockchain', {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const index = (this.selectedAccount.account as LedgerAccount).index;
+
+        Notify.create({
+          message: 'Please sign the transaction with your ledger',
+          type: 'info',
+          progress: true,
+          actions: [
+            {
+              label: 'OK',
+              color: 'white',
+
+              handler: () => {
+                /* ... */
+              },
+            },
+          ],
+        });
         const sig = (await ledgerHelper.signTx(index, tx.txParams)).sig;
         const payload = JSON.stringify({
           ...tx.txParams,
