@@ -10,6 +10,7 @@
       align="left"
       no-caps
       switch-indicator
+      @update:model-value="updateSelectedFile"
     >
       <q-tab
         class="q-pa-none q-pl-sm"
@@ -31,7 +32,7 @@
         </div>
       </q-tab>
     </q-tabs>
-    <q-separator color="grey-4"/>
+    <q-separator color="grey-4" />
 
     <div
       v-for="file in filesStore.openFiles"
@@ -52,7 +53,7 @@ import { useFilesStore } from 'src/stores/files';
 import ScillaEditor from 'components/TextEditor/ScillaEditor.vue';
 import { ref, onMounted } from 'vue';
 import { eventBus } from 'src/event-bus';
-import { ScillaContract } from 'src/utils';
+import { ScillaFile } from 'src/utils';
 
 const tab = ref('tab');
 const filesStore = useFilesStore();
@@ -64,13 +65,20 @@ const closeFile = (file: string) => {
 };
 
 onMounted(() => {
-  eventBus.on('contract-selected', (contract: ScillaContract) => {
-    tab.value = contract.name;
+  eventBus.on('scilla-file-selected', (file: ScillaFile) => {
+    tab.value = file.name;
   });
+
+  if (filesStore.selected) {
+    tab.value = filesStore.selected.name;
+  }
 });
+
+const updateSelectedFile = (tab: string) => {
+  filesStore.setSelected(tab);
+};
 
 defineOptions({
   name: 'EditorPage',
 });
-
 </script>

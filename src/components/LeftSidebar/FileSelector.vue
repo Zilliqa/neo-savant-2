@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useFilesStore } from 'src/stores/files';
-import { ScillaContract } from 'src/utils';
+import { ScillaFile } from 'src/utils';
 import { eventBus } from 'src/event-bus';
 import { useQuasar } from 'quasar';
 
@@ -29,7 +29,7 @@ const fileNodes = computed(() => {
       key: 'default-contracts',
       selectable: false,
       expandable: true,
-      children: filesStore.files.map((contract: ScillaContract) => ({
+      children: filesStore.files.map((contract: ScillaFile) => ({
         label: contract.name,
         key: contract.name,
         icon: 'description',
@@ -45,11 +45,10 @@ function change(target: string) {
   } catch (error) {
     q.notify({
       type: 'warning',
-      message: `${error}`
-    })
+      message: `${error}`,
+    });
   }
-  const contract = filesStore.getByName(target);
-  if (contract)
-    eventBus.emit('contract-selected', contract);
+  const file = filesStore.getByName(target);
+  if (file) eventBus.emit('scilla-file-selected', file);
 }
 </script>

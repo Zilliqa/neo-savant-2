@@ -9,9 +9,9 @@ import nonFungibleToken from './nonfungible_token.scilla?raw';
 import schnorr from './schnorr.scilla?raw';
 import zilGame from './zil_hash_game.scilla?raw';
 import asciiart from './asciiart.scilla?raw';
-import { ScillaContract } from 'src/utils';
+import { ScillaFile } from 'src/utils';
 
-export const defaultScillaContracts: ScillaContract[] = [
+export const defaultScillaContracts: ScillaFile[] = [
   { name: 'HelloWorld.scilla', code: helloWorld },
   { name: 'ZRC-6.scilla', code: zrc6 },
   { name: 'BookStore.scilla', code: bookstore },
