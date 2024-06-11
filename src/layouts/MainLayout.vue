@@ -11,7 +11,7 @@
       bordered
       :width="leftDrawerWidth"
     >
-      <left-sidebar />
+      <left-sidebar class="fit" />
       <div
         v-touch-pan.preserveCursor.prevent.mouse.horizontal="resizeLeftDrawer"
         class="q-drawer__resizer_left"
