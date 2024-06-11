@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { Contract, PendingContract, TransitionCalls } from '../utils/models';
 import { Init, TxParams, Value, toChecksumAddress } from '@zilliqa-js/zilliqa';
 import { useBlockchainStore } from './blockchain';
-import { useTransactionsStore } from './transactions';
 import { Notify } from 'quasar';
 
 export const useContractsStore = defineStore('contracts', {
@@ -65,21 +64,19 @@ export const useContractsStore = defineStore('contracts', {
         return;
       }
 
-      const transactions = useTransactionsStore();
       const blockchain = useBlockchainStore();
       const responses = await Promise.all(
-        this.pending.map((c) => {
-          return transactions.refreshTransactionStatus(c.txHash);
+        this.pending.map((c: PendingContract) => {
+          return blockchain.getTransactionStatus(c.txHash);
         })
       );
 
-      const deployed = this.pending.filter((c, i) => {
-        const statusMessage = responses[i].statusMessage;
-        return statusMessage === 'Confirmed';
+      const deployed = this.pending.filter((_: PendingContract, i: number) => {
+        return responses[i].status === 'Confirmed';
       });
 
       const contractAddresses = await Promise.all(
-        deployed.map((c) => {
+        deployed.map((c: PendingContract) => {
           return blockchain.getContractAddressFromTransactionID(c.txHash);
         })
       );
@@ -96,16 +93,16 @@ export const useContractsStore = defineStore('contracts', {
         });
       });
 
-      this.pending = this.pending.filter((c, i) => {
+      this.pending = this.pending.filter((c: PendingContract, i: number) => {
         const statusMessage = responses[i].statusMessage;
-        const id = responses[i].ID;
+        const id = c.txHash;
         if (statusMessage === 'Confirmed') {
           return false; // To filter out
         } else if (statusMessage.startsWith('Rejected')) {
           // TODO: Show the exact message.
           Notify.create({
             type: 'warning',
-            message: `Contract deployment failed, id: ${id}, reason: ${statusMessage}`,
+            message: `Contract deployment failed, txHash: ${id}, reason: ${statusMessage}`,
           });
           return false; // To filter out
         }
@@ -137,7 +134,7 @@ export const useContractsStore = defineStore('contracts', {
       );
 
       if (id === undefined) {
-        throw new Error('Invalid transaction hash: ', id);
+        throw new Error(`Invalid transaction hash: ${id}`);
       }
 
       this.pending.push({

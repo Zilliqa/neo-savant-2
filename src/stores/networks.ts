@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { Zilliqa } from '@zilliqa-js/zilliqa';
 import { Network } from '../utils/models';
 
 export const useNetworksStore = defineStore('networks', {
@@ -43,14 +42,6 @@ export const useNetworksStore = defineStore('networks', {
     ] as Network[],
   }),
   getters: {
-    getZilliqa: (state) => (name: string) => {
-      const network = state.networks.find((network) => network.name === name);
-      if (network === undefined) {
-        throw new Error(`No network with name of ${name}`);
-      }
-
-      return new Zilliqa(network.url);
-    },
     getByName: (state) => (name: string) => {
       return state.networks.find((network) => network.name === name);
     },

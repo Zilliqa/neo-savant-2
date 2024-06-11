@@ -1,8 +1,45 @@
 <template>
-  <q-btn-dropdown dense icon="dns" unelevated no-caps label="Transactions">
+  <q-btn-dropdown
+    dense
+    icon="dns"
+    unelevated
+    no-caps
+    @hide="
+      rejectedCount = 0;
+      confirmedCount = 0;
+    "
+  >
+    <template v-slot:label>
+      Transactions
+      <q-badge
+        v-if="pendingCount > 0"
+        color="orange-5"
+        class="q-ml-xs text-bold"
+        rounded
+        >{{ pendingCount }}
+        <q-tooltip>Pending</q-tooltip>
+      </q-badge>
+      <q-badge
+        v-if="confirmedCount > 0"
+        color="green-5"
+        class="q-ml-xs text-bold"
+        rounded
+        >{{ confirmedCount }}
+        <q-tooltip>Confirmed</q-tooltip>
+      </q-badge>
+      <q-badge
+        v-if="rejectedCount > 0"
+        color="red-5"
+        class="q-ml-xs text-bold"
+        rounded
+        >{{ rejectedCount }}
+        <q-tooltip>Rejected</q-tooltip>
+      </q-badge>
+    </template>
+
     <q-list dense>
       <div v-for="transaction in store.transactions" :key="transaction.id">
-        <q-item>
+        <q-item :class="`bg-${listItemBgColor(transaction.status)}`">
           <q-item-section>
             <q-item-label>
               <truncated-text
@@ -15,7 +52,7 @@
             </q-item-label>
             <q-item-label caption>
               <q-badge
-                :color="txStatusColor(transaction.statusMessage)"
+                :color="txStatusColor(transaction.status)"
                 class="text-bold"
               >
                 {{ transaction.statusMessage }} </q-badge
@@ -55,29 +92,57 @@ import CopyToClipboardBtn from 'src/components/CopyToClipboardBtn.vue';
 import TruncatedText from 'components/TruncatedText.vue';
 import { useBlockchainStore } from 'src/stores/blockchain';
 import { onMounted, onUnmounted } from 'vue';
+import { TransactionStatus } from 'src/utils';
+import { ref } from 'vue';
+import { eventBus } from 'src/event-bus';
 
 const store = useTransactionsStore();
 const blockchainStore = useBlockchainStore();
 let intervalId: NodeJS.Timeout;
+const pendingCount = ref(0);
+const confirmedCount = ref(0);
+const rejectedCount = ref(0);
 
 onMounted(() => {
   intervalId = setInterval(async () => {
     await store.refreshPendingTxns();
   }, 5000);
+
+  eventBus.on(
+    'pending-txn-status-changed',
+    (pending: number, confirmed: number, rejected: number) => {
+      pendingCount.value = pending;
+      confirmedCount.value = confirmed;
+      rejectedCount.value = rejected;
+    }
+  );
 });
 
 onUnmounted(() => clearInterval(intervalId));
 
-const txStatusColor = (statusMessage: string) => {
-  switch (statusMessage) {
-    case 'Initialised':
+const txStatusColor = (status: TransactionStatus) => {
+  switch (status) {
+    case 'Initialized':
       return 'blue';
     case 'Confirmed':
       return 'green';
     case 'Pending':
-      return 'yellow';
+      return 'orange';
     case 'Rejected':
       return 'red';
+  }
+};
+
+const listItemBgColor = (status: TransactionStatus) => {
+  switch (status) {
+    case 'Initialized':
+      return 'blue-2';
+    case 'Confirmed':
+      return 'white';
+    case 'Pending':
+      return 'yellow-2';
+    case 'Rejected':
+      return 'red-2';
   }
 };
 </script>
