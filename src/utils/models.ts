@@ -73,7 +73,7 @@ export interface WaitingTransaction {
   amount: string;
 }
 
-export interface ScillaContract {
+export interface ScillaFile {
   name: string;
   code: string;
   fileName?: string;

@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { defaultScillaContracts } from 'src/contracts';
-import { ScillaContract } from 'src/utils';
+import { ScillaFile } from 'src/utils';
 
 export const useFilesStore = defineStore('files', {
   state: () => ({
-    files: [...defaultScillaContracts] as ScillaContract[],
-    selected: null as null | ScillaContract,
+    files: [...defaultScillaContracts] as ScillaFile[],
+    selected: null as null | ScillaFile,
     openFiles: [] as string[],
   }),
   actions: {
@@ -89,8 +89,8 @@ export const useFilesStore = defineStore('files', {
   getters: {
     getByName:
       (state) =>
-      (name: string): ScillaContract | undefined => {
-        return state.files.find((item: ScillaContract) => item.name === name);
+      (name: string): ScillaFile | undefined => {
+        return state.files.find((item: ScillaFile) => item.name === name);
       },
   },
   persist: true,

@@ -219,7 +219,7 @@ const callTransition = async () => {
     );
 
     q.notify({
-      type: 'info',
+      type: 'positive',
       message: `Transition ${transitionName} called successfully. ${txHash}`,
     });
   } catch (error) {

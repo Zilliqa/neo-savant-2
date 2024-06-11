@@ -19,8 +19,7 @@ import { useContractsStore } from 'src/stores/contracts';
 
 const q = useQuasar();
 
-const props = defineProps(['contract'])
-
+const props = defineProps(['contract']);
 
 const showDeleteContractDialog = () => {
   q.dialog({
@@ -32,16 +31,15 @@ const showDeleteContractDialog = () => {
     try {
       contractsStore.delete(props.contract.name);
       q.notify({
-        message: `${props.contract.name} delete successfully.`,
-        type: 'info'
-      })
+        message: `${props.contract.name} deleted successfully.`,
+        type: 'positive',
+      });
     } catch (error) {
       q.notify({
         message: `${props.contract.name} failed to delete.`,
-        type: 'negative'
-      })
+        type: 'negative',
+      });
     }
-  })
-}
-
+  });
+};
 </script>

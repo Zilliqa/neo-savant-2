@@ -1,14 +1,16 @@
 <template lang="">
-  <div class="column full-height">
-    <files-title-bar/>
-    <q-scroll-area class="col">
-      <file-selector />
-    </q-scroll-area>
-    <contracts-title-bar/>
-    <q-scroll-area class="col">
+  <q-splitter horizontal v-model="splitterModel" class="column full-height">
+    <template v-slot:before>
+      <q-scroll-area class="fit">
+        <files-title-bar />
+        <file-selector />
+      </q-scroll-area>
+    </template>
+    <template v-slot:after>
+      <contracts-title-bar />
       <contract-list />
-    </q-scroll-area>
-  </div>
+    </template>
+  </q-splitter>
 </template>
 
 <script setup lang="ts">
@@ -16,5 +18,7 @@ import ContractList from 'components/LeftSidebar/ContractList.vue';
 import FileSelector from 'components/LeftSidebar/FileSelector.vue';
 import ContractsTitleBar from 'components/LeftSidebar/ContractsList/ContractsTitleBar.vue';
 import FilesTitleBar from 'components/LeftSidebar/FilesList/FilesTitleBar.vue';
-</script>
+import { ref } from 'vue';
 
+const splitterModel = ref(50);
+</script>
