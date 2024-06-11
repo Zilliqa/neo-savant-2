@@ -179,7 +179,7 @@ const loadPrivateKey = () => {
   );
   show.value = false;
   q.notify({
-    type: 'info',
+    type: 'positive',
     message: `${account.bech32Address} imported successfully.`,
   });
 };
@@ -208,7 +208,7 @@ const loadKeystore = async () => {
       }
     );
     q.notify({
-      type: 'info',
+      type: 'positive',
       message: `${account.bech32Address} imported successfully.`,
     });
     show.value = false;
@@ -224,7 +224,7 @@ const connectToZilpay = async () => {
   try {
     await zilpayHelper.connect();
     q.notify({
-      type: 'info',
+      type: 'positive',
       message: 'Successfully connected to Zilpay wallet!',
     });
     show.value = false;

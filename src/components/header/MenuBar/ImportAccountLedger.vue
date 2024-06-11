@@ -119,7 +119,7 @@ const connectToLedger = async () => {
     );
     connectedToLedger.value = true;
     q.notify({
-      type: 'info',
+      type: 'positive',
       message: 'Successfully connected to Ledger!',
     });
   } catch (error) {

@@ -8,6 +8,7 @@ import {
   ZilpayAccount,
 } from 'src/utils';
 import { useBlockchainStore } from './blockchain';
+import { Notify } from 'quasar';
 
 export const useAccountsStore = defineStore('accounts', {
   state: () => ({
@@ -46,9 +47,31 @@ export const useAccountsStore = defineStore('accounts', {
       } else if ('zilpay' in account) {
         blockchainStore.setManagedByZilpay(true);
       } else if ('index' in account) {
-        // Do nothing for leger account
+        // Do nothing for ledger account, because txn verifications are done on ledger
       } else {
         blockchainStore.addAccount(account.privateKey);
+      }
+
+      if (blockchainStore.selectedAccount === null) {
+        blockchainStore.setSelectedAccount(name);
+      } else {
+        Notify.create({
+          message: `Do you want to select ${name} as the default account?`,
+          type: 'info',
+          icon: 'help',
+          timeout: 7000,
+          progress: true,
+          actions: [
+            {
+              label: 'Select',
+              color: 'white',
+
+              handler: () => {
+                blockchainStore.setSelectedAccount(name);
+              },
+            },
+          ],
+        });
       }
     },
     remove(name: string) {
