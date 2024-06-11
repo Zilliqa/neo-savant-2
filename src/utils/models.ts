@@ -1,4 +1,5 @@
 import { ZilPay } from 'zilpay-types';
+import { TransactionStatus } from './txns';
 
 export interface Network {
   name: string;
@@ -64,13 +65,14 @@ export interface PrivatekeyAccount {
   privateKey: string;
 }
 
-export interface WaitingTransaction {
+export interface Transaction {
   id: string;
   network: string;
-  statusMessage: string;
   from: string;
   to: string;
   amount: string;
+  status: TransactionStatus;
+  statusMessage: string;
 }
 
 export interface ScillaFile {

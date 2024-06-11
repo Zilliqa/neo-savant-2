@@ -11,10 +11,14 @@ import { useNetworksStore } from './networks';
 import { BN, bytes, units } from '@zilliqa-js/util';
 import { TxParams, Zilliqa, toChecksumAddress } from '@zilliqa-js/zilliqa';
 import { useTransactionsStore } from './transactions';
-import Long from 'long';
-import { zilpayHelper } from 'src/utils';
+import {
+  TransactionStatus,
+  interpretTransactionStatus,
+  zilpayHelper,
+} from 'src/utils';
 import { ledgerHelper } from 'src/utils';
 import { Notify } from 'quasar';
+import Long from 'long';
 
 export const useBlockchainStore = defineStore('blockchain', {
   state: () => ({
@@ -154,6 +158,21 @@ export const useBlockchainStore = defineStore('blockchain', {
         }
 
         return response.result;
+      };
+    },
+    getTransactionStatus: (state) => {
+      return async (
+        txHash: string
+      ): Promise<{ status: TransactionStatus; statusMessage: string }> => {
+        if (state.zilliqa === null) {
+          throw new Error('Please select a network');
+        }
+
+        const response = await state.zilliqa.blockchain.getTransactionStatus(
+          txHash
+        );
+
+        return interpretTransactionStatus(response);
       };
     },
     minimumGasPrice: async (state) => {
@@ -364,6 +383,7 @@ export const useBlockchainStore = defineStore('blockchain', {
       const store = useTransactionsStore();
       store.add({
         id: txnId,
+        status: 'Initialized',
         statusMessage: 'Initialized',
         network: this.selectedNetworkName,
         amount: txParams.amount,
