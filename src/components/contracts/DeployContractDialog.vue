@@ -21,7 +21,7 @@
               label="Contract Name"
               hint="For easier reference"
               v-model="contractName"
-              :rules="[val => !!val || 'Name is required']"
+              :rules="[(val) => !!val || 'Name is required']"
             />
           </div>
         </div>
@@ -66,12 +66,21 @@
       </q-card-section>
       <q-separator />
       <q-card-actions class="bg-grey-2">
-        <q-btn no-caps flat icon="upload" color="primary" :loading="loading" @click="deploy" :disable="deployBtnIsDisabled"
+        <q-btn
+          no-caps
+          flat
+          icon="upload"
+          color="primary"
+          :loading="loading"
+          @click="deploy"
+          :disable="deployBtnIsDisabled"
           >Deploy</q-btn
         >
         <q-space />
         <q-btn no-caps flat icon="delete_forever" color="red">Reset</q-btn>
-        <q-btn no-caps flat icon="close" color="warning" v-close-popup>Cancel</q-btn>
+        <q-btn no-caps flat icon="close" color="warning" v-close-popup
+          >Cancel</q-btn
+        >
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -84,7 +93,7 @@ import { ref } from 'vue';
 import ContractInput from './ContractInput.vue';
 import { useQuasar } from 'quasar';
 import { useContractsStore } from 'src/stores/contracts';
-import { BN, Long} from '@zilliqa-js/util';
+import { BN, Long } from '@zilliqa-js/util';
 import GasPriceInput from 'src/components/GasPriceInput.vue';
 
 const q = useQuasar();
@@ -94,28 +103,30 @@ const show = ref(true);
 const amount = ref(0);
 const gasPrice = ref(0);
 const gasLimit = ref(30000);
-const contractName = ref('')
+const contractName = ref('');
 
 const abi = ref();
 let abiParams = [];
-const initializationParameters = ref({})
+const initializationParameters = ref({});
 const contractsStore = useContractsStore();
 
 const deployBtnIsDisabled = computed(() => {
   return contractName.value === '';
-})
+});
 
 onMounted(async () => {
   try {
     const contractAbi = await getContractAbi(props.code);
     abi.value = contractAbi;
     abiParams = contractAbi.params;
-    abiParams.forEach(item => initializationParameters.value[item.vname] = '')
+    abiParams.forEach(
+      (item) => (initializationParameters.value[item.vname] = '')
+    );
   } catch (error) {
     q.notify({
       type: 'warning',
-      message: `Failed to get the contract ABI. ${error}`
-    })
+      message: `Failed to get the contract ABI. ${error}`,
+    });
   }
 });
 
@@ -124,21 +135,25 @@ const props = defineProps(['file', 'code']);
 const deploy = async () => {
   loading.value = true;
   try {
-    const id = await contractsStore.deploy(contractName.value, props.code, {
-      gasPrice: new BN(gasPrice.value),
-      gasLimit: Long.fromNumber(gasLimit.value),
-      amount: new BN(amount.value),
-    }, abiParams.map(param => ({
-      ...param,
-      value: initializationParameters.value[param.vname]
-    })))
+    const id = await contractsStore.deploy(
+      contractName.value,
+      props.code,
+      {
+        gasPrice: new BN(gasPrice.value),
+        gasLimit: Long.fromNumber(gasLimit.value),
+        amount: new BN(amount.value),
+      },
+      abiParams.map((param) => ({
+        ...param,
+        value: initializationParameters.value[param.vname],
+      }))
+    );
     q.notify({
       type: 'info',
       message: `Contract deployment started. ${id}`,
     });
     show.value = false;
   } catch (error) {
-    console.log(error)
     q.notify({
       type: 'negative',
       message: `Failed to deploy. ${error}`,

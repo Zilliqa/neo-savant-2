@@ -73,6 +73,7 @@ export interface Transaction {
   amount: string;
   status: TransactionStatus;
   statusMessage: string;
+  success?: boolean; // As soon as txn is confirmed, indicates whether is failed or succeeded.
 }
 
 export interface ScillaFile {

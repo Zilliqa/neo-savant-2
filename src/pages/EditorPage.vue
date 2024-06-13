@@ -64,9 +64,7 @@ const tab = ref('tab');
 const filesStore = useFilesStore();
 const closeFile = (file: string) => {
   filesStore.removeFromOpenFiles(file);
-  console.log(filesStore.openFiles[0]);
   tab.value = filesStore.openFiles[0];
-  console.log(tab.value);
 };
 
 const thumbStyle = {

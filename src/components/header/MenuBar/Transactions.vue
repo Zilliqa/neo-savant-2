@@ -39,16 +39,40 @@
 
     <q-list dense>
       <div v-for="transaction in store.transactions" :key="transaction.id">
-        <q-item :class="`bg-${listItemBgColor(transaction.status)}`">
+        <q-item>
           <q-item-section>
             <q-item-label>
-              <truncated-text
-                :text="transaction.id"
-                :length="40"
-                :position="20"
-                :link="blockchainStore.getExplorerLinkForTx(transaction.id)"
-              />
-              <copy-to-clipboard-btn :content="transaction.id" />
+              <div
+                :class="`row items-center q-gutter-x-xs bg-${listItemBgColor(
+                  transaction.success
+                )}`"
+                style="border-radius: 4px"
+              >
+                <q-circular-progress
+                  indeterminate
+                  rounded
+                  size="14px"
+                  color="orange"
+                  v-if="transaction.success === undefined"
+                />
+                <q-icon
+                  v-else-if="transaction.success"
+                  name="task_alt"
+                  color="green"
+                >
+                  <q-tooltip>Transaction was successful</q-tooltip>
+                </q-icon>
+                <q-icon v-else name="highlight_off" color="red">
+                  <q-tooltip>Transaction failed</q-tooltip>
+                </q-icon>
+                <truncated-text
+                  :text="transaction.id"
+                  :length="40"
+                  :position="20"
+                  :link="blockchainStore.getExplorerLinkForTx(transaction.id)"
+                />
+                <copy-to-clipboard-btn :content="transaction.id" />
+              </div>
             </q-item-label>
             <q-item-label caption>
               <q-badge
@@ -133,16 +157,13 @@ const txStatusColor = (status: TransactionStatus) => {
   }
 };
 
-const listItemBgColor = (status: TransactionStatus) => {
-  switch (status) {
-    case 'Initialized':
-      return 'blue-2';
-    case 'Confirmed':
-      return 'white';
-    case 'Pending':
-      return 'yellow-2';
-    case 'Rejected':
-      return 'red-2';
+const listItemBgColor = (success: boolean | undefined) => {
+  if (success === undefined) {
+    return 'yellow-1';
+  } else if (success) {
+    return 'green-1';
+  } else {
+    return 'red-1';
   }
 };
 </script>

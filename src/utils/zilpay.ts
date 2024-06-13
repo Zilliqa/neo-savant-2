@@ -55,7 +55,6 @@ export class ZilpayHelper {
       throw new Error('ZilPay is not installed!');
     }
 
-    console.log(window.zilPay);
     if (!window.zilPay.wallet.isConnect) {
       return window.zilPay.wallet.connect();
     }
