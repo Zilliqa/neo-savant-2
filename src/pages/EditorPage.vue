@@ -1,37 +1,42 @@
 <template>
   <q-page class="column">
-    <q-tabs
-      v-model="tab"
-      dense
-      class="bg-grey-2"
-      active-class="bg-grey-4"
-      active-color="grey-10"
-      indicator-color="orange"
-      align="left"
-      no-caps
-      switch-indicator
-      @update:model-value="updateSelectedFile"
+    <q-scroll-area
+      class="full-width"
+      style="height: 38px"
+      :thumb-style="thumbStyle"
     >
-      <q-tab
-        class="q-pa-none q-pl-sm"
-        v-for="file in filesStore.openFiles"
-        :name="file"
-        :key="file"
+      <q-tabs
+        v-model="tab"
+        dense
+        class="bg-grey-2"
+        active-class="bg-grey-4"
+        active-color="grey-10"
+        indicator-color="orange"
+        align="left"
+        no-caps
+        @update:model-value="updateSelectedFile"
       >
-        <div class="row items-center">
-          {{ file }}
-          <q-btn
-            round
-            dense
-            flat
-            icon="close"
-            size="xs"
-            class="q-ml-xs"
-            @click="closeFile(file)"
-          />
-        </div>
-      </q-tab>
-    </q-tabs>
+        <q-tab
+          class="q-pa-none q-pl-sm"
+          v-for="file in filesStore.openFiles"
+          :name="file"
+          :key="file"
+        >
+          <div class="items-center">
+            {{ file }}
+            <q-btn
+              round
+              dense
+              flat
+              icon="close"
+              size="xs"
+              class="q-ml-xs"
+              @click="closeFile(file)"
+            />
+          </div>
+        </q-tab>
+      </q-tabs>
+    </q-scroll-area>
     <q-separator color="grey-4" />
 
     <div
@@ -62,6 +67,11 @@ const closeFile = (file: string) => {
   console.log(filesStore.openFiles[0]);
   tab.value = filesStore.openFiles[0];
   console.log(tab.value);
+};
+
+const thumbStyle = {
+  backgroundColor: 'grey-1',
+  height: '5px',
 };
 
 onMounted(() => {
