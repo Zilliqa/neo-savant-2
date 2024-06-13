@@ -23,12 +23,6 @@ export const useFilesStore = defineStore('files', {
         return; // File already added
       }
 
-      if (this.openFiles.length === 5) {
-        throw new Error(
-          'We only support 5 open files. Close one of your files!'
-        );
-      }
-
       this.openFiles.push(name);
     },
     setSelected(name: string) {
