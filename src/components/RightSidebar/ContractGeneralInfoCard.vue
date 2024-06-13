@@ -80,12 +80,11 @@ const fetchCode = async () => {
     mode.value = 'code';
     loading.value = true;
     data.value = await blockchainStore.getSmartContractCode(props.address);
-    console.log(data.value);
   } catch (error) {
     mode.value = null;
     q.notify({
       type: 'negative',
-      message: `Failed to get the receipt. ${error.message}`,
+      message: `Failed to get the contract code. ${error.message}`,
     });
   } finally {
     loading.value = false;

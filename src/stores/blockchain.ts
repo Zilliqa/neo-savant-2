@@ -163,7 +163,11 @@ export const useBlockchainStore = defineStore('blockchain', {
     getTransactionStatus: (state) => {
       return async (
         txHash: string
-      ): Promise<{ status: TransactionStatus; statusMessage: string }> => {
+      ): Promise<{
+        status: TransactionStatus;
+        statusMessage: string;
+        success: boolean | undefined;
+      }> => {
         if (state.zilliqa === null) {
           throw new Error('Please select a network');
         }
@@ -172,7 +176,15 @@ export const useBlockchainStore = defineStore('blockchain', {
           txHash
         );
 
-        return interpretTransactionStatus(response);
+        const status = interpretTransactionStatus(response);
+
+        return {
+          ...status,
+          success:
+            status.status === 'Confirmed' || status.status === 'Rejected'
+              ? response.success
+              : undefined,
+        };
       };
     },
     minimumGasPrice: async (state) => {
@@ -265,7 +277,7 @@ export const useBlockchainStore = defineStore('blockchain', {
       }
       this.selectedAccount = account;
       this.refreshSelectedAccountBalance().then(() => {
-        console.log('update');
+        /* */
       });
     },
     setSelectedNetwork(name: string) {

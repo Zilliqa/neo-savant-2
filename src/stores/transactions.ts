@@ -19,8 +19,6 @@ export const useTransactionsStore = defineStore('transactions', {
             (tx.status === 'Pending' || tx.status === 'Initialized')
         );
       } catch (error) {
-        console.log('hererererere');
-        console.log(state.transactions);
         return [];
       }
     },
@@ -44,10 +42,11 @@ export const useTransactionsStore = defineStore('transactions', {
       }
 
       const blockchainStore = useBlockchainStore();
-      const { status, statusMessage } =
+      const { status, statusMessage, success } =
         await blockchainStore.getTransactionStatus(txHash);
       txn.status = status;
       txn.statusMessage = statusMessage;
+      txn.success = success;
     },
     async refreshPendingTxns() {
       const blockchainStore = useBlockchainStore();
@@ -60,10 +59,11 @@ export const useTransactionsStore = defineStore('transactions', {
 
       await Promise.all(
         this.pendingTransactions.map(async (tx: Transaction) => {
-          const { status, statusMessage } =
+          const { status, statusMessage, success } =
             await blockchainStore.getTransactionStatus(tx.id);
           tx.status = status;
           tx.statusMessage = statusMessage;
+          tx.success = success;
           switch (status) {
             case 'Confirmed':
               confirmedCount++;

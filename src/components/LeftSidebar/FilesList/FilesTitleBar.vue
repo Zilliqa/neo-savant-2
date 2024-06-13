@@ -67,7 +67,6 @@ const selectFile = () => {
 const fileSelected = async (file: File) => {
   const content = await readFileAsText(file);
   filesStore.addNew(file.name, content.toString());
-  console.log(file);
 };
 
 const newFileClicked = () => {
