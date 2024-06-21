@@ -1,0 +1,11 @@
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: neo-savant-2
+  namespace: neo-savant-2
+  labels:
+    app.kubernetes.io/name: neo-savant-2
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: RESPONSE_CODE
