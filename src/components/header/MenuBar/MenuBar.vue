@@ -89,6 +89,28 @@
       </q-menu>
     </q-btn>
     <q-space />
+    <div
+      v-if="userProfile.showOldIdeLink"
+      class="text-white bg-blue-9 q-px-xs"
+      style="border-radius: 5px"
+    >
+      <a
+        target="_blank"
+        href="https://old-ide.zilliqa.com"
+        class="text-white text-bold"
+        style="font-size: 0.8em; border-radius: 5px"
+      >
+        Go to Legacy IDE
+      </a>
+      <q-btn
+        icon="close"
+        rounded
+        dense
+        flat
+        @click="userProfile.setShowOldIdLink(false)"
+      ></q-btn>
+    </div>
+    <q-space />
     <q-separator color="grey-9" vertical />
     <div class="row">
       <q-space />
@@ -111,9 +133,11 @@ import TransferZilDialog from 'components/Tools/TransferZilDialog.vue';
 import { computed } from 'vue';
 import { useQuasar, openURL } from 'quasar';
 import { useBlockchainStore } from 'src/stores/blockchain';
+import { useUserProfile } from 'src/stores/user-profile';
 
 const q = useQuasar();
 const blockchain = useBlockchainStore();
+const userProfile = useUserProfile();
 
 const faucetLink = computed(() => {
   if (
