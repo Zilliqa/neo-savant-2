@@ -127,7 +127,12 @@ const isAdt = (type) => {
 const scillaTypeToHtmlInputType = (type) => {
   if (type.startsWith('Int') || type.startsWith('Uint')) {
     return 'number';
-  } else if (type === 'String' || type === 'ByStr20' || type === 'BNum') {
+  } else if (
+    type === 'String' ||
+    type === 'ByStr20' ||
+    type === 'BNum' ||
+    type.startsWith('ByStr20 with')
+  ) {
     return 'text';
   } else if (
     type.startsWith('Option') ||
@@ -199,7 +204,8 @@ const callTransition = async () => {
         : transitionsParameters.value[param.vname]; // It's already a JSON
     } else {
       return {
-        ...param,
+        vname: param.vname,
+        type: param.type.replace(/ByStr20 with .*end/g, 'ByStr20'), // Replace complex ByStr20 types with ByStr20 as scilla interpreter expects
         value: transitionsParameters.value[param.vname],
       };
     }
