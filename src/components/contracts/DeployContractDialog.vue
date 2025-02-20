@@ -144,7 +144,8 @@ const deploy = async () => {
         amount: new BN(amount.value),
       },
       abiParams.map((param) => ({
-        ...param,
+        vname: param.vname,
+        type: param.type.replace(/ByStr20 with .*end/g, 'ByStr20'), // Replace complex ByStr20 types with ByStr20 as scilla interpreter expects
         value: initializationParameters.value[param.vname],
       }))
     );
@@ -154,9 +155,10 @@ const deploy = async () => {
     });
     show.value = false;
   } catch (error) {
+    const errorMessage = typeof error === 'object' && error.message ? error.message : error;
     q.notify({
       type: 'negative',
-      message: `Failed to deploy. ${error}`,
+      message: `Failed to deploy. ${errorMessage}`,
     });
   } finally {
     loading.value = false;

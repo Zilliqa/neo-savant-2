@@ -118,6 +118,7 @@ export const useContractsStore = defineStore('contracts', {
         },
       ];
 
+      console.log('Deploying contract with init:', init);
       txParams.toAddr = '0x0000000000000000000000000000000000000000';
       const id = await blockchain.sendTransaction(
         txParams,
