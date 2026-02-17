@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: neo-savant-2
+  labels:
+    app.kubernetes.io/name: neo-savant-2
+spec:
+  parentRefs:
+    - name: gke-gateway
+      namespace: gke-gateway-stg
+      sectionName: https
+  hostnames:
+    - ide2.zilstg.dev
+    - stg-ide.zilliqa.com
+  rules:
+    - backendRefs:
+        - name: neo-savant-2
+          port: 80
