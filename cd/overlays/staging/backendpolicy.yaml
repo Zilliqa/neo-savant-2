@@ -1,0 +1,11 @@
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: neo-savant-2
+spec:
+  default:
+    securityPolicy: staging-gateway
+  targetRef:
+    group: ""
+    kind: Service
+    name: neo-savant-2

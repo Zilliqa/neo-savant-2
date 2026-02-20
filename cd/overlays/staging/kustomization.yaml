@@ -5,4 +5,5 @@ namespace: neo-savant-2-stg
 
 resources:
   - ../../base
+  - backendpolicy.yaml
   - httproute.yaml
