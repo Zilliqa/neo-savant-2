@@ -3,8 +3,6 @@ kind: GCPBackendPolicy
 metadata:
   name: neo-savant-2
 spec:
-  default:
-    securityPolicy: staging-gateway
   targetRef:
     group: ""
     kind: Service
