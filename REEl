@@ -1,0 +1,44 @@
+scilla_version 0
+
+contract ReelTest
+(
+  owner: ByStr20,
+  init_supply: Uint128
+)
+
+field total_supply : Uint128 = init_supply
+field balances : Map ByStr20 Uint128 = Emp ByStr20 Uint128
+field owner_field : ByStr20 = owner
+
+transition Init()
+  owner_addr <- owner_field;
+  balances[owner_addr] := total_supply
+end
+
+transition Transfer(to: ByStr20, value: Uint128)
+  sender <- _sender;
+  bal_opt <- balances[sender];
+  match bal_opt with
+  | Some bal =>
+    can_transfer = builtin ge bal value;
+    match can_transfer with
+    | True =>
+      new_from_bal = builtin sub bal value;
+      balances[sender] := new_from_bal;
+      to_bal_opt <- balances[to];
+      match to_bal_opt with
+      | Some tb =>
+        new_to_bal = builtin add tb value;
+        balances[to] := new_to_bal
+      | None =>
+        balances[to] := value
+      end
+    | False => (* insufficient balance *) 
+      e = {_tag : "Fail"; _recipient : sender; _amount : Uint128 0};
+      send sender 0
+    end
+  | None => (* no balance *) 
+    e = {_tag : "Fail"; _recipient : sender; _amount : Uint128 0};
+    send sender 0
+  end
+end
