@@ -22,6 +22,7 @@
             :text="props.contract.txHash"
             :length="22"
             :position="12"
+            :link="blockchainStore.getExplorerLinkForTx(props.contract.txHash)"
           />
           <copy-to-clipboard-btn :content="props.contract.txHash" />
         </div>
@@ -33,6 +34,8 @@
 <script setup lang="ts">
 import TruncatedText from 'components/TruncatedText.vue';
 import CopyToClipboardBtn from 'components/CopyToClipboardBtn.vue';
+import { useBlockchainStore } from 'src/stores/blockchain';
 
-const props = defineProps(['contract'])
+const blockchainStore = useBlockchainStore();
+const props = defineProps(['contract']);
 </script>
